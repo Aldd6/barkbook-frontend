@@ -4,7 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-BarkBook is a pet hotel management system. This repo is the React front end and is currently the unmodified Vite + React template (`src/App.jsx` is still the starter page): no router, state library, HTTP client, or test framework has been added yet. The back end lives in a sibling repo, `C:\Programs\VSCode\BarkBook-BackEnd` (Express 5 + Sequelize/PostgreSQL + Redis + Stripe, CommonJS).
+BarkBook is a pet hotel management system (brand: Guau & Miau Club). This repo is the React front end, built in phases (base → auth → cliente → recepción → operación → administración). No test framework has been added. The back end lives in a sibling repo, `C:\Programs\VSCode\BarkBook-BackEnd` (Express 5 + Sequelize/PostgreSQL + Redis + Stripe, CommonJS).
+
+Layout of `src/`:
+- `api/` — `client.js` is the single axios instance (base URL from `VITE_API_URL`, `withCredentials`, Bearer interceptor, deduplicated `/auth/refresh` on 401 with one retry). Errors are normalized to `ApiError { status, flag, message, details, fieldErrors }` (`errors.js`). One module per resource: queries return the payload key (`r.data.pet`); mutations return the whole body so screens can show the API `message` in a toast (`useToast`).
+- `hooks/` — `useApiQuery(fetcher)` (memoize the fetcher with `useCallback`; returns `{ data, error, loading, reload }`, render with `<QueryState>`), `useForm` (local validation + API `details[]` per field), `useRoomCatalog` (branches/room types/room branches to resolve a booking's `branchRoomId`).
+- `payments/` — Stripe Elements: wrap the form in `<StripeProvider>`, render `<CardField>`, call `useCardPayment().createPaymentMethodId()` and send it as `stripePaymentMethodId`.
+- Customer screens ("Mi cuenta") sit behind `RequireCustomer` and nav items with `requiresCustomer`, since they call the routes filtered by `customer.id`.
+- `auth/` — `AuthProvider` keeps the access token in memory and `user/customer/employee/permissions` from `/auth/me`; route guards (`RequireAuth`, `RequireProfile`, `RequirePermission`, `GuestOnly`). Use `hasPermission()` for UI decisions; the Administrador passes every check, as in the back end.
+- `constants/` — exact API enums (`enums.js`, with `*_OPTIONS` for selects) and permission names (`permissions.js`).
+- `utils/` — form validators matching the back-end DTOs, and formatters (GTQ, dates).
+- `layout/` (CoreUI sidebar/header), `nav/_nav.js` (menu items declare their required permission), `components/`, `views/`, `routes.jsx`.
 
 ## Commands
 
@@ -23,6 +33,9 @@ Back end (run from `BarkBook-BackEnd`): `npm start` serves the API on `http://lo
 
 - React 19, Vite 8 with `@vitejs/plugin-react` (Oxc), plain JavaScript/JSX (no TypeScript), ES modules.
 - React Compiler is not enabled.
+- CoreUI 5 (`@coreui/react`, `@coreui/icons-react`) without Sass: the brand palette overrides CoreUI CSS variables in `src/styles/theme.css`. Routing with `react-router-dom`, HTTP with `axios`, global state with React Context (no Redux).
+- Env vars (`.env.example`): `VITE_API_URL`, `VITE_STRIPE_PUBLISHABLE_KEY`.
+- In this Windows setup, run npm scripts from PowerShell; Git Bash can't find `node`.
 
 ## Integrating with the back end
 

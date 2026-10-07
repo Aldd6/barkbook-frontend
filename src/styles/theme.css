@@ -1,0 +1,208 @@
+/* Tema de Guau & Miau Club sobre CoreUI 5.
+   CoreUI usa variables CSS (--cui-*) para casi todo; los botones y el foco de los
+   inputs traen el color compilado, por eso se sobrescriben aparte. */
+
+:root,
+[data-coreui-theme='light'] {
+  /* Paleta de la marca */
+  --bb-orange: #cc5803;
+  --bb-orange-dark: #a34603;
+  --bb-amber: #ff9505;
+  --bb-brown: #582b11;
+  --bb-sand: #e7d7c9;
+
+  --cui-primary: var(--bb-orange);
+  --cui-primary-rgb: 204, 88, 3;
+  --cui-primary-text-emphasis: #7a3502;
+  --cui-primary-bg-subtle: #f5ded0;
+  --cui-primary-border-subtle: #ebbc9a;
+
+  --cui-warning: var(--bb-amber);
+  --cui-warning-rgb: 255, 149, 5;
+  --cui-warning-text-emphasis: var(--bb-brown);
+  --cui-warning-bg-subtle: #ffead0;
+  --cui-warning-border-subtle: #ffd59b;
+
+  --cui-link-color: var(--bb-orange);
+  --cui-link-color-rgb: 204, 88, 3;
+  --cui-link-hover-color: var(--bb-orange-dark);
+  --cui-link-hover-color-rgb: 163, 70, 3;
+
+  --cui-focus-ring-color: rgba(204, 88, 3, 0.25);
+  --cui-heading-color: var(--bb-brown);
+}
+
+/* Botones */
+.btn-primary {
+  --cui-btn-color: #fff;
+  --cui-btn-bg: var(--bb-orange);
+  --cui-btn-border-color: var(--bb-orange);
+  --cui-btn-hover-color: #fff;
+  --cui-btn-hover-bg: #b34d03;
+  --cui-btn-hover-border-color: var(--bb-orange-dark);
+  --cui-btn-focus-shadow-rgb: 204, 88, 3;
+  --cui-btn-active-color: #fff;
+  --cui-btn-active-bg: var(--bb-orange-dark);
+  --cui-btn-active-border-color: #994202;
+  --cui-btn-disabled-color: #fff;
+  --cui-btn-disabled-bg: var(--bb-orange);
+  --cui-btn-disabled-border-color: var(--bb-orange);
+}
+
+.btn-outline-primary,
+.btn-ghost-primary {
+  --cui-btn-color: var(--bb-orange);
+  --cui-btn-hover-color: #fff;
+  --cui-btn-hover-bg: var(--bb-orange);
+  --cui-btn-hover-border-color: var(--bb-orange);
+  --cui-btn-focus-shadow-rgb: 204, 88, 3;
+  --cui-btn-active-color: #fff;
+  --cui-btn-active-bg: var(--bb-orange);
+  --cui-btn-active-border-color: var(--bb-orange);
+  --cui-btn-disabled-color: var(--bb-orange);
+}
+
+.btn-outline-primary {
+  --cui-btn-border-color: var(--bb-orange);
+  --cui-btn-disabled-border-color: var(--bb-orange);
+}
+
+.btn-warning {
+  --cui-btn-color: var(--bb-brown);
+  --cui-btn-bg: var(--bb-amber);
+  --cui-btn-border-color: var(--bb-amber);
+  --cui-btn-hover-color: var(--bb-brown);
+  --cui-btn-hover-bg: #e88604;
+  --cui-btn-hover-border-color: #e88604;
+  --cui-btn-focus-shadow-rgb: 255, 149, 5;
+  --cui-btn-active-color: var(--bb-brown);
+  --cui-btn-active-bg: #d97d04;
+  --cui-btn-active-border-color: #d97d04;
+  --cui-btn-disabled-color: var(--bb-brown);
+  --cui-btn-disabled-bg: var(--bb-amber);
+  --cui-btn-disabled-border-color: var(--bb-amber);
+}
+
+/* Foco de inputs */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: #e6ac81;
+  box-shadow: 0 0 0 0.25rem rgba(204, 88, 3, 0.25);
+}
+
+/* Sidebar: cafe de la marca, encabezado claro para que el logo se lea bien */
+.sidebar.app-sidebar {
+  --cui-sidebar-bg: var(--bb-brown);
+  --cui-sidebar-nav-link-active-bg: rgba(204, 88, 3, 0.35);
+  --cui-sidebar-nav-link-hover-bg: rgba(255, 149, 5, 0.15);
+  --cui-sidebar-nav-link-active-icon-color: var(--bb-amber);
+  --cui-sidebar-nav-link-hover-icon-color: var(--bb-amber);
+  --cui-sidebar-nav-title-color: rgba(231, 215, 201, 0.6);
+}
+
+.app-sidebar-brand {
+  background-color: #fff;
+  min-height: calc(4rem + 1px);
+  border-bottom: 1px solid rgba(88, 43, 17, 0.15);
+}
+
+.app-sidebar-brand .btn-close {
+  margin-inline-start: auto;
+}
+
+/* Layout (equivalente al scss del template de CoreUI) */
+.wrapper {
+  width: 100%;
+  padding-inline-start: var(--cui-sidebar-occupy-start, 0);
+  background-color: var(--bb-sand);
+  transition: padding 0.15s;
+}
+
+.app-header > .container-fluid {
+  min-height: calc(4rem + 1px);
+}
+
+.sidebar-toggler {
+  margin-inline-start: auto;
+}
+
+.app-greeting {
+  color: var(--bb-brown);
+}
+
+.app-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background-color: var(--bb-sand);
+  color: var(--bb-brown);
+}
+
+.app-footer {
+  color: var(--bb-brown);
+  font-size: 0.875rem;
+}
+
+.page-title {
+  color: var(--bb-brown);
+}
+
+.permission-badge {
+  font-weight: 500;
+  border: 1px solid var(--bb-sand);
+}
+
+/* Pantallas de autenticacion */
+.auth-layout {
+  background-color: var(--bb-sand);
+}
+
+.auth-logo {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+}
+
+/* Tarjetas seleccionables (habitaciones y servicios) */
+.room-option {
+  border: 1px solid var(--cui-border-color);
+  background-color: var(--cui-body-bg);
+  color: inherit;
+  padding: 0;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.room-option:hover {
+  border-color: #e6ac81;
+}
+
+.room-option:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(204, 88, 3, 0.25);
+}
+
+.room-option-selected {
+  border-color: var(--bb-orange);
+  box-shadow: 0 0 0 1px var(--bb-orange);
+  background-color: #fff8f2;
+}
+
+/* Resumen fijo al hacer scroll en pantallas grandes */
+@media (min-width: 992px) {
+  .booking-summary {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+/* Campo de tarjeta de Stripe con el aspecto de un input de CoreUI */
+.stripe-card-field {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
