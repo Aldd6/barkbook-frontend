@@ -1,4 +1,4 @@
-import { cilBan, cilBasket, cilBed, cilBuilding, cilCalendar, cilCalendarCheck, cilContact, cilHome, cilLayers, cilPaw, cilPeople, cilRoom, cilSitemap, cilSpa, cilUser, cilWallet } from '@coreui/icons'
+import { cilBan, cilBasket, cilBed, cilBuilding, cilCalendar, cilCalendarCheck, cilContact, cilHome, cilLayers, cilPaw, cilPeople, cilRoom, cilSitemap, cilSpa, cilTask, cilUser, cilWallet } from '@coreui/icons'
 import { PERMISSIONS, ROOM_OPERATION_PERMISSIONS } from '../constants/permissions'
 
 // Menu lateral agrupado por secciones. Cada item se muestra solo si:
@@ -32,6 +32,10 @@ const navigation = [
       { name: 'Pagos pendientes', to: '/recepcion/pendientes', icon: cilWallet, permission: PERMISSIONS.VER_RESERVAS_DIA },
       { name: 'Cancelaciones', to: '/recepcion/cancelaciones', icon: cilBan, permission: PERMISSIONS.GESTIONAR_CANCELACIONES_RESERVACION },
     ],
+  },
+  {
+    title: 'Cuidado',
+    items: [{ name: 'Servicios pendientes', to: '/cuidado/servicios', icon: cilTask, permission: PERMISSIONS.SUBIR_INFORMES_SERVICIOS }],
   },
   {
     title: 'Operación',

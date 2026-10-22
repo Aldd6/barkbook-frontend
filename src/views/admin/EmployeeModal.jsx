@@ -1,4 +1,4 @@
-import { CCol, CFormInput, CRow } from '@coreui/react'
+import { CBadge, CButton, CCol, CFormInput, CRow } from '@coreui/react'
 import useForm from '../../hooks/useForm'
 import useToast from '../../components/toast/useToast'
 import FormModal from '../../components/FormModal'
@@ -52,8 +52,9 @@ const toPayload = (values, isNew) => {
 }
 
 // POST /employees o PUT /employees/:id. Renderizar con key para reiniciar el formulario.
-// `employee`: undefined = cerrado, null = nuevo, objeto = editar (incluye la foto).
-export default function EmployeeModal({ employee, branches, onClose, onSaved }) {
+// `employee`: undefined = cerrado, null = nuevo, objeto = editar (incluye la foto y el acceso al sistema).
+// onGrantAccess / onChangePassword / onRevoke reciben el empleado; onGrantAccess es opcional.
+export default function EmployeeModal({ employee, branches, onClose, onSaved, onGrantAccess, onChangePassword, onRevoke }) {
   const toast = useToast()
   const isNew = employee === null
   const { values, setValue, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(toFormValues(employee), {
@@ -93,6 +94,34 @@ export default function EmployeeModal({ employee, branches, onClose, onSaved }) 
                 onChanged={onSaved}
               />
             </div>
+          </CCol>
+        )}
+        {!isNew && employee && (
+          <CCol xs={12} className="mb-3">
+            <div className="form-label">Acceso al sistema</div>
+            <div className="d-flex flex-wrap align-items-center gap-2">
+              {employee.userId ? (
+                <>
+                  <CBadge color="success">Con acceso</CBadge>
+                  <CButton color="secondary" variant="outline" size="sm" onClick={() => onChangePassword(employee)} disabled={submitting}>
+                    Cambiar contraseña
+                  </CButton>
+                  <CButton color="danger" variant="outline" size="sm" onClick={() => onRevoke(employee)} disabled={submitting}>
+                    Revocar acceso
+                  </CButton>
+                </>
+              ) : (
+                <>
+                  <CBadge color="secondary">Sin usuario</CBadge>
+                  {onGrantAccess && (
+                    <CButton color="primary" variant="outline" size="sm" onClick={() => onGrantAccess(employee)} disabled={submitting}>
+                      Dar acceso
+                    </CButton>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="form-text">Los cambios de datos sin guardar se pierden al usar estas acciones.</div>
           </CCol>
         )}
         <CCol md={6}>

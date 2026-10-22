@@ -16,7 +16,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLink, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilLink, cilLinkBroken, cilLockLocked, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import useAuth from '../../auth/useAuth'
 import useApiQuery from '../../hooks/useApiQuery'
 import useToast from '../../components/toast/useToast'
@@ -27,7 +27,8 @@ import ApiErrorAlert from '../../components/ApiErrorAlert'
 import Avatar from '../../components/Avatar'
 import EmployeeModal from './EmployeeModal'
 import EmployeeUserModal from './EmployeeUserModal'
-import { deleteEmployee, getEmployees } from '../../api/employees'
+import EmployeePasswordModal from './EmployeePasswordModal'
+import { deleteEmployee, getEmployees, revokeEmployeeUser } from '../../api/employees'
 import { getBranches } from '../../api/branches'
 import { toApiError } from '../../api/errors'
 import { ADMIN_ROLE_NAME } from '../../constants/permissions'
@@ -46,6 +47,10 @@ export default function Employees() {
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
+  const [passwordFor, setPasswordFor] = useState(null)
+  const [toRevoke, setToRevoke] = useState(null)
+  const [revoking, setRevoking] = useState(false)
+  const [revokeError, setRevokeError] = useState(null)
 
   const canCreateUsers = user.roleName === ADMIN_ROLE_NAME
   const branchList = branches.data ?? []
@@ -75,6 +80,31 @@ export default function Employees() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  const closeRevoke = () => {
+    setToRevoke(null)
+    setRevokeError(null)
+  }
+
+  const handleRevoke = async () => {
+    setRevoking(true)
+    try {
+      const { message } = await revokeEmployeeUser(toRevoke.id)
+      toast.success(message)
+      closeRevoke()
+      employees.reload()
+    } catch (error) {
+      setRevokeError(toApiError(error))
+    } finally {
+      setRevoking(false)
+    }
+  }
+
+  // Acciones de acceso desde el modal de edicion: se cierra ese modal y se abre el de la accion.
+  const fromEditor = (open) => (employee) => {
+    setEditingId(undefined)
+    open(employee)
   }
 
   return (
@@ -161,6 +191,30 @@ export default function Employees() {
                           )}
                         </CTableDataCell>
                         <CTableDataCell className="text-end text-nowrap">
+                          {employee.userId && (
+                            <>
+                              <CButton
+                                color="secondary"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setPasswordFor(employee)}
+                                aria-label={`Cambiar contraseña de ${fullName}`}
+                                title="Cambiar contraseña"
+                              >
+                                <CIcon icon={cilLockLocked} />
+                              </CButton>
+                              <CButton
+                                color="warning"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setToRevoke(employee)}
+                                aria-label={`Revocar acceso de ${fullName}`}
+                                title="Revocar acceso"
+                              >
+                                <CIcon icon={cilLinkBroken} />
+                              </CButton>
+                            </>
+                          )}
                           <CButton color="primary" variant="ghost" size="sm" onClick={() => setEditingId(employee.id)} aria-label={`Editar ${fullName}`}>
                             <CIcon icon={cilPencil} />
                           </CButton>
@@ -184,7 +238,29 @@ export default function Employees() {
         branches={branchList}
         onClose={() => setEditingId(undefined)}
         onSaved={employees.reload}
+        onGrantAccess={canCreateUsers ? fromEditor(setUserFor) : undefined}
+        onChangePassword={fromEditor(setPasswordFor)}
+        onRevoke={fromEditor(setToRevoke)}
       />
+
+      <EmployeePasswordModal key={passwordFor?.id ?? 'closed'} employee={passwordFor} onClose={() => setPasswordFor(null)} />
+
+      <ConfirmModal
+        visible={Boolean(toRevoke)}
+        title="Revocar acceso"
+        confirmLabel="Revocar acceso"
+        color="danger"
+        loading={revoking}
+        onConfirm={handleRevoke}
+        onClose={closeRevoke}
+      >
+        <ApiErrorAlert error={revokeError} />
+        <p>
+          ¿Desea desvincular el usuario de <strong>{toRevoke && `${toRevoke.name} ${toRevoke.lastname}`}</strong>? Perderá el acceso al sistema:
+          sus sesiones se cierran y en menos de 15 minutos deberá iniciar sesión de nuevo, lo que ya no podrá hacer.
+        </p>
+        <p className="mb-0 text-body-secondary">La cuenta no se elimina: puede volver a vincularse a este u otro empleado con “Dar acceso”.</p>
+      </ConfirmModal>
 
       <EmployeeUserModal key={userFor?.id ?? 'closed'} employee={userFor} onClose={() => setUserFor(null)} onSaved={employees.reload} />
 

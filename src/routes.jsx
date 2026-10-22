@@ -29,6 +29,7 @@ import CheckIn from './views/reception/CheckIn'
 import CheckOut from './views/reception/CheckOut'
 import Cancellations from './views/reception/Cancellations'
 import Rooms from './views/operation/Rooms'
+import PendingServices from './views/care/PendingServices'
 import Branches from './views/admin/Branches'
 import Employees from './views/admin/Employees'
 import RoomTypes from './views/admin/RoomTypes'
@@ -103,6 +104,11 @@ export default function AppRoutes() {
             {/* La API filtra las solicitudes por la sede del empleado */}
             <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_CANCELACIONES_RESERVACION} />}>
               <Route path="/recepcion/cancelaciones" element={<Cancellations />} />
+            </Route>
+
+            {/* Cuidado: la API filtra las ordenes por la sede del empleado */}
+            <Route element={<RequirePermission permission={PERMISSIONS.SUBIR_INFORMES_SERVICIOS} />}>
+              <Route path="/cuidado/servicios" element={<PendingServices />} />
             </Route>
 
             {/* Operacion: GET /room-inventory solo pide sesion; la pantalla sirve a quien cambia estados o gestiona habitaciones */}

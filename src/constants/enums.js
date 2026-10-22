@@ -110,15 +110,9 @@ export const PAYMENT_METHOD_LABELS = Object.freeze({
   TRANSFERENCIA: 'Transferencia',
 })
 
-// Metodo de pago al cargar un servicio durante la estancia.
-export const SERVICE_PAYMENT_OPTION = Object.freeze({
-  TARJETA: 'TARJETA CREDITO/DEBITO',
-  CARGO_A_CUENTA: 'CARGO A CUENTA',
-})
-export const SERVICE_PAYMENT_OPTION_LABELS = Object.freeze({
-  'TARJETA CREDITO/DEBITO': 'Tarjeta de crédito / débito',
-  'CARGO A CUENTA': 'Cargo a cuenta (pagar en recepción)',
-})
+// Orden de servicio: el cliente la contrata (PENDIENTE) y el cuidador de la sede la completa o se cancela.
+export const SERVICE_ORDER_STATUS = Object.freeze({ PENDIENTE: 'PENDIENTE', COMPLETADO: 'COMPLETADO', CANCELADO: 'CANCELADO' })
+export const SERVICE_ORDER_STATUS_LABELS = Object.freeze({ PENDIENTE: 'Pendiente', COMPLETADO: 'Completado', CANCELADO: 'Cancelado' })
 
 export const MOVEMENT_TYPE = Object.freeze({ CARGO: 'CARGO', ABONO: 'ABONO', REEMBOLSO: 'REEMBOLSO' })
 export const MOVEMENT_TYPE_LABELS = Object.freeze({ CARGO: 'Cargo', ABONO: 'Abono', REEMBOLSO: 'Reembolso' })
@@ -150,9 +144,9 @@ export const BOOKING_STATUS_OPTIONS = toOptions(BOOKING_STATUS, BOOKING_STATUS_L
 export const PAYMENT_METHOD_OPTIONS = toOptions(PAYMENT_METHOD, PAYMENT_METHOD_LABELS)
 // Pagos en mostrador (confirm-payment y check-out) aceptan cualquier metodo menos tarjeta.
 export const COUNTER_PAYMENT_METHOD_OPTIONS = PAYMENT_METHOD_OPTIONS.filter((o) => o.value !== PAYMENT_METHOD.TARJETA)
-export const SERVICE_PAYMENT_OPTION_OPTIONS = toOptions(SERVICE_PAYMENT_OPTION, SERVICE_PAYMENT_OPTION_LABELS)
 export const MOVEMENT_TYPE_OPTIONS = toOptions(MOVEMENT_TYPE, MOVEMENT_TYPE_LABELS)
 export const CHECK_IN_STATUS_OPTIONS = toOptions(CHECK_IN_STATUS, CHECK_IN_STATUS_LABELS)
 export const SERVICE_TYPE_OPTIONS = toOptions(SERVICE_TYPE, SERVICE_TYPE_LABELS)
+export const SERVICE_ORDER_STATUS_OPTIONS = toOptions(SERVICE_ORDER_STATUS, SERVICE_ORDER_STATUS_LABELS)
 export const CANCELLATION_STATUS_OPTIONS = toOptions(CANCELLATION_STATUS, CANCELLATION_STATUS_LABELS)
 export const TYPE_TRANSACTION_OPTIONS = toOptions(TYPE_TRANSACTION, TYPE_TRANSACTION_LABELS)

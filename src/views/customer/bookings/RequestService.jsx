@@ -10,26 +10,24 @@ import QueryState from '../../../components/QueryState'
 import FormField from '../../../components/FormField'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
 import ConfirmModal from '../../../components/ConfirmModal'
-import StripeProvider from '../../../payments/StripeProvider'
-import CardField from '../../../payments/CardField'
-import useCardPayment from '../../../payments/useCardPayment'
-import { isStripeConfigured } from '../../../payments/stripe'
 import { getBooking } from '../../../api/bookings'
-import { getServicesForBooking, chargeServiceToBooking } from '../../../api/services'
+import { getServicesForBooking } from '../../../api/services'
+import { createServiceOrders } from '../../../api/serviceOrders'
 import { getCheckInByBooking } from '../../../api/checkIns'
 import { getPetsByCustomer } from '../../../api/pets'
-import { BOOKING_STATUS, PET_SPECIES_LABELS, SERVICE_PAYMENT_OPTION, SERVICE_PAYMENT_OPTION_OPTIONS, SERVICE_TYPE_LABELS } from '../../../constants/enums'
+import { BOOKING_STATUS, PET_SPECIES_LABELS, SERVICE_TYPE_LABELS } from '../../../constants/enums'
 import { maxLength, required } from '../../../utils/validators'
 import { formatCurrency } from '../../../utils/format'
 
-const FIELDS = ['serviceId', 'petIds', 'paymentMethod', 'description', 'stripePaymentMethodId']
+const FIELDS = ['serviceId', 'petIds', 'description']
 
 const loadBookingContext = async (bookingId, customerId) => {
   const [booking, checkIn, pets] = await Promise.all([getBooking(bookingId), getCheckInByBooking(bookingId), getPetsByCustomer(customerId)])
   return { booking, checkIn, pets }
 }
 
-// El cliente carga servicios a su reserva EN ESTANCIA (seccion "Servicios" de API.md).
+// El cliente contrata servicios para su reserva EN ESTANCIA (seccion "Servicios" de API.md): se crea una
+// orden PENDIENTE y el cargo se registra en la cuenta cuando el cuidador de la sede la completa.
 export default function RequestService() {
   const { id } = useParams()
   const { state } = useLocation()
@@ -86,9 +84,7 @@ function ServiceCatalog({ bookingId, checkIn, pets, backTo }) {
           este momento.
         </CAlert>
       ) : (
-        <StripeProvider>
-          <ServiceForm bookingId={bookingId} services={services.data ?? []} admittedPets={admittedPets} backTo={backTo} />
-        </StripeProvider>
+        <ServiceForm bookingId={bookingId} services={services.data ?? []} admittedPets={admittedPets} backTo={backTo} />
       )}
     </QueryState>
   )
@@ -104,16 +100,14 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
   const navigate = useNavigate()
   const toast = useToast()
   const [confirming, setConfirming] = useState(false)
-  const { createPaymentMethodId } = useCardPayment()
   const { values, setValue, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(
-    { serviceId: '', petIds: admittedPets.map((pet) => pet.id), paymentMethod: '', description: '' },
+    { serviceId: '', petIds: admittedPets.map((pet) => pet.id), description: '' },
     {
       rules: (current) => {
         const service = services.find((s) => String(s.id) === current.serviceId)
         return {
           serviceId: [required('Seleccione un servicio.')],
           petIds: service && !service.isMultiGuest ? [(value) => (value.length === 0 ? 'Debe indicar al menos una mascota.' : null)] : [],
-          paymentMethod: [required('Seleccione cómo desea pagar el servicio.')],
           description: [maxLength(255, 'La descripcion no puede exceder los 255 caracteres.')],
         }
       },
@@ -122,8 +116,9 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
 
   const selectedService = services.find((service) => String(service.id) === values.serviceId)
   const perPet = selectedService && !selectedService.isMultiGuest
-  const amount = selectedService ? selectedService.rate * (perPet ? values.petIds.length : 1) : 0
-  const payWithCard = values.paymentMethod === SERVICE_PAYMENT_OPTION.TARJETA
+  // Por mascota: una orden por cada una, cada una por la tarifa. Grupal: una sola orden.
+  const orderCount = perPet ? values.petIds.length : 1
+  const amount = selectedService ? selectedService.rate * orderCount : 0
 
   const togglePet = (petId) => {
     const next = values.petIds.includes(petId) ? values.petIds.filter((id) => id !== petId) : [...values.petIds, petId]
@@ -132,17 +127,16 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
 
   const selectedPetNames = admittedPets.filter((pet) => values.petIds.includes(pet.id)).map((pet) => pet.name)
 
-  // Primero valida y pide confirmacion; el cargo se hace al confirmar (con tarjeta se cobra al momento).
+  // Primero valida y pide confirmacion; la orden se crea al confirmar.
   const onSubmit = handleSubmit(async () => setConfirming(true))
 
   const onConfirm = handleSubmit(async (form) => {
-    const payload = { serviceId: Number(form.serviceId), paymentMethod: form.paymentMethod }
+    const payload = { serviceId: Number(form.serviceId) }
     if (perPet) payload.petIds = form.petIds
     if (form.description.trim()) payload.description = form.description.trim()
     // Ante cualquier error se cierra el modal para que se vea el mensaje en el formulario.
     try {
-      if (form.paymentMethod === SERVICE_PAYMENT_OPTION.TARJETA) payload.stripePaymentMethodId = await createPaymentMethodId()
-      const result = await chargeServiceToBooking(bookingId, payload)
+      const result = await createServiceOrders(bookingId, payload)
       toast.success(result.message)
       navigate(backTo)
     } finally {
@@ -209,32 +203,13 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
           )}
 
           <CCard>
-            <CCardHeader className="fw-semibold">{perPet ? '3' : '2'}. Pago</CCardHeader>
+            <CCardHeader className="fw-semibold">{perPet ? '3' : '2'}. Indicaciones</CCardHeader>
             <CCardBody>
-              {SERVICE_PAYMENT_OPTION_OPTIONS.map((option) => (
-                <CFormCheck
-                  key={option.value}
-                  type="radio"
-                  name="paymentMethod"
-                  id={`payment-${option.value}`}
-                  value={option.value}
-                  label={option.label}
-                  checked={values.paymentMethod === option.value}
-                  disabled={option.value === SERVICE_PAYMENT_OPTION.TARJETA && !isStripeConfigured}
-                  onChange={handleChange}
-                />
-              ))}
-              {fieldError('paymentMethod') && <div className="invalid-feedback d-block mb-2">{fieldError('paymentMethod')}</div>}
-              <div className="mt-3">
-                {payWithCard && <CardField error={fieldError('stripePaymentMethodId')} />}
-                {values.paymentMethod === SERVICE_PAYMENT_OPTION.CARGO_A_CUENTA && (
-                  <CAlert color="info">El monto se suma al saldo de su reserva y se cobra en recepción al hacer el check-out.</CAlert>
-                )}
-              </div>
               <FormField
                 name="description"
-                label="Indicaciones (opcional)"
+                label="Indicaciones para el cuidador (opcional)"
                 multiline
+                maxLength={255}
                 rows={2}
                 className="mb-0"
                 value={values.description}
@@ -260,18 +235,17 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
                 </div>
               )}
               <hr />
-              <div className="d-flex justify-content-between fs-5 fw-semibold mb-3">
+              <div className="d-flex justify-content-between fs-5 fw-semibold mb-2">
                 <span>Total</span>
                 <span>{formatCurrency(amount)}</span>
               </div>
+              <p className="small text-body-secondary">
+                No se cobra ahora: se cargará a su cuenta cuando el cuidador complete el servicio y se paga en recepción al hacer el check-out.
+              </p>
               <div className="d-grid">
                 <CButton type="submit" color="primary" disabled={submitting}>
                   {submitting && <CSpinner size="sm" className="me-2" />}
-                  {payWithCard
-                    ? `Pagar ${formatCurrency(amount)}`
-                    : values.paymentMethod === SERVICE_PAYMENT_OPTION.CARGO_A_CUENTA
-                      ? 'Cargar a mi cuenta'
-                      : 'Solicitar servicio'}
+                  Solicitar servicio
                 </CButton>
               </div>
             </CCardBody>
@@ -282,7 +256,7 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
       <ConfirmModal
         visible={confirming}
         title="Confirmar servicio"
-        confirmLabel={payWithCard ? `Pagar ${formatCurrency(amount)}` : 'Cargar a mi cuenta'}
+        confirmLabel="Solicitar servicio"
         loading={submitting}
         onConfirm={onConfirm}
         onClose={() => setConfirming(false)}
@@ -292,9 +266,8 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
           {perPet && selectedPetNames.length > 0 && <> para {selectedPetNames.join(', ')}</>} por <strong>{formatCurrency(amount)}</strong>.
         </p>
         <p className="mb-0 text-body-secondary">
-          {payWithCard
-            ? 'El monto se cobrará de inmediato a su tarjeta.'
-            : 'El monto se sumará al saldo de su reserva y se cobrará en recepción al hacer el check-out.'}
+          {orderCount > 1 ? `Se crearán ${orderCount} órdenes, una por mascota. ` : ''}
+          Se cargará a su cuenta cuando el cuidador lo complete; puede cancelarlo mientras siga pendiente.
         </p>
       </ConfirmModal>
     </CForm>

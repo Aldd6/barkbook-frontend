@@ -11,7 +11,10 @@ import BillTable from '../../components/BillTable'
 import BookingInfoCard from '../../components/booking/BookingInfoCard'
 import StayInfoCard from '../../components/booking/StayInfoCard'
 import ConfirmPaymentModal from '../../components/booking/ConfirmPaymentModal'
+import ServiceOrdersTable from '../../components/booking/ServiceOrdersTable'
+import ResolveServiceOrderModal from '../../components/booking/ResolveServiceOrderModal'
 import { getCancellationsByBooking } from '../../api/bookingCancellations'
+import { getServiceOrdersByBooking } from '../../api/serviceOrders'
 import { BOOKING_STATUS, CANCELLATION_STATUS, KINSHIP_LABELS } from '../../constants/enums'
 import { PERMISSIONS } from '../../constants/permissions'
 import { formatCurrency, formatDate, formatDateTime, todayISO } from '../../utils/format'
@@ -23,13 +26,23 @@ export default function FrontDeskBooking() {
   const file = useApiQuery(useCallback(() => loadBookingFile(id), [id]))
   const catalog = useRoomCatalog()
   const cancellations = useApiQuery(useCallback(() => getCancellationsByBooking(id), [id]))
+  const serviceOrders = useApiQuery(useCallback(() => getServiceOrdersByBooking(id), [id]))
   const [toPay, setToPay] = useState(null)
+  const [orderAction, setOrderAction] = useState(null) // { order, complete }
 
   const booking = file.data?.booking
   // Con una solicitud de cancelacion pendiente el back end rechaza el check-in hasta resolverla.
   const pendingCancellation = cancellations.data?.find((item) => item.status === CANCELLATION_STATUS.PENDIENTE)
   const canCheckIn = booking && !pendingCancellation && isArrivalDue(booking, todayISO()) && hasPermission(PERMISSIONS.HACER_CHECK_IN)
   const canCheckOut = booking?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && hasPermission(PERMISSIONS.HACER_CHECK_OUT)
+  const inStay = booking?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA
+  // Cancelar una orden: Recepcionista (Hacer check-out) o Cuidador de la sede; completarla: solo el Cuidador.
+  const canCancelOrders = inStay && (hasPermission(PERMISSIONS.HACER_CHECK_OUT) || hasPermission(PERMISSIONS.SUBIR_INFORMES_SERVICIOS))
+  const canCompleteOrders = inStay && hasPermission(PERMISSIONS.SUBIR_INFORMES_SERVICIOS)
+  const onOrderResolved = () => {
+    serviceOrders.reload()
+    file.reload()
+  }
   const canPay = booking?.bookingStatus === BOOKING_STATUS.PENDIENTE && booking.balance > 0 && hasPermission(PERMISSIONS.APLICAR_PAGOS_MOSTRADOR)
 
   return (
@@ -128,10 +141,30 @@ export default function FrontDeskBooking() {
                   <BillTable bill={booking.bill} balance={booking.balance} />
                 </CCardBody>
               </CCard>
+              {(inStay || serviceOrders.data?.length > 0) && (
+                <CCard className="mt-4">
+                  <CCardHeader className="fw-semibold">Servicios contratados</CCardHeader>
+                  <CCardBody>
+                    <QueryState query={serviceOrders}>
+                      <ServiceOrdersTable
+                        orders={serviceOrders.data}
+                        onCancel={canCancelOrders ? (order) => setOrderAction({ order, complete: false }) : undefined}
+                        onComplete={canCompleteOrders ? (order) => setOrderAction({ order, complete: true }) : undefined}
+                      />
+                    </QueryState>
+                  </CCardBody>
+                </CCard>
+              )}
             </CCol>
           </CRow>
 
           <ConfirmPaymentModal key={toPay?.id ?? 'none'} booking={toPay} onClose={() => setToPay(null)} onPaid={file.reload} />
+          <ResolveServiceOrderModal
+            key={orderAction ? `${orderAction.order.id}-${orderAction.complete}` : 'closed'}
+            action={orderAction}
+            onClose={() => setOrderAction(null)}
+            onResolved={onOrderResolved}
+          />
         </>
       )}
     </QueryState>

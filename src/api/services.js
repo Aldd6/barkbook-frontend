@@ -7,7 +7,7 @@ export const getServices = () => client.get('/services').then((r) => r.data.serv
 
 // Mutaciones (P: Gestionar catalogo de servicios): devuelven el body completo ({ message, service }).
 // { name, description?, serviceType, speciesType? (null = cualquier especie), isMultiGuest, rate }
-// Cambiar la tarifa no afecta los cargos ya registrados en las reservas.
+// Cambiar la tarifa no afecta las ordenes ya contratadas ni los cargos registrados.
 export const createService = (data) => client.post('/services', data).then((r) => r.data)
 
 export const updateService = (id, data) => client.put(`/services/${id}`, data).then((r) => r.data)
@@ -24,12 +24,7 @@ export const createServiceBranch = (data) => client.post('/service-branches', da
 
 export const deleteServiceBranch = (id) => client.delete(`/service-branches/${id}`).then((r) => r.data)
 
-// --- Cargo de servicios durante la estancia (Cliente) ---
+// --- Catalogo para una reserva EN ESTANCIA (Cliente) ---
 
-// Catalogo para cargar a una reserva: solo servicios de la sede y especie de la reserva.
+// Solo servicios de la sede y especie de la reserva. Para contratarlos, ver api/serviceOrders.js.
 export const getServicesForBooking = (bookingId) => client.get(`/services/booking/${bookingId}`).then((r) => r.data.services)
-
-// { serviceId, paymentMethod (SERVICE_PAYMENT_OPTION), petIds?, stripePaymentMethodId?, description? }
-// -> { message, bill, payment (abono con tarjeta o null), balance }
-export const chargeServiceToBooking = (bookingId, data) =>
-  client.post(`/services/booking/${bookingId}/charge`, data).then((r) => r.data)
