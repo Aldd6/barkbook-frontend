@@ -28,6 +28,9 @@ const AWAITING_ARRIVAL = [BOOKING_STATUS.CONFIRMADA, BOOKING_STATUS.PENDIENTE]
 export const isArrivalDue = (booking, today) =>
   AWAITING_ARRIVAL.includes(booking.bookingStatus) && booking.checkInDate <= today && today < booking.checkOutDate
 
+// Reservas por llegar en fechas futuras (el check-in aun no se permite).
+export const isUpcoming = (booking, today) => AWAITING_ARRIVAL.includes(booking.bookingStatus) && booking.checkInDate > today
+
 // Estancias cuya fecha de salida es hoy o ya paso.
 export const isDepartureDue = (booking, today) => booking.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && booking.checkOutDate <= today
 

@@ -11,8 +11,9 @@ import {
   CHeaderToggler,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilAccountLogout, cilMenu, cilUser } from '@coreui/icons'
+import { cilAccountLogout, cilMenu } from '@coreui/icons'
 import useAuth from '../auth/useAuth'
+import Avatar from '../components/Avatar'
 
 export default function AppHeader({ onToggleSidebar }) {
   const { user, customer, employee, logout } = useAuth()
@@ -36,9 +37,7 @@ export default function AppHeader({ onToggleSidebar }) {
           <span className="fw-semibold me-3 app-greeting">Hola {displayName}!</span>
           <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false} className="py-0" aria-label="Opciones de usuario">
-              <span className="app-avatar">
-                <CIcon icon={cilUser} />
-              </span>
+              <Avatar src={customer?.profilePicture ?? employee?.profilePicture} />
             </CDropdownToggle>
             <CDropdownMenu className="pt-0">
               <CDropdownHeader className="bg-body-secondary fw-semibold">

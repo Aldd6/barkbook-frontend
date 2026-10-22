@@ -48,8 +48,9 @@ The API contract is documented in `BarkBook-BackEnd/docs/API.md`, written in Spa
 - **Response shape:** success is `{ success, status, message, <resource> }`. The payload key is singular for one record (`pet`) and plural for lists (`pets`). Validation errors (400) include `details: [{ field, message }]` with dot-path fields such as `pets.0.nonadmissionReason`, so they can be shown next to each form field. Business errors carry a `flag` (`RESOURCE_CONFLICT`, `UNAUTHORIZED_ACCESS`, …). Server messages are in Spanish and meant to be shown to users.
 - **Ownership:** users with the `Cliente` role can only reach their own resources. Global lists (`GET /pets`, `/customers`, …) are blocked for them, so customer-facing screens must use the filtered routes (e.g. `/pets/customer/:customerId`).
 - **Enums and formats:** the API takes exact Spanish enum strings (e.g. `RESERVA PENDIENTE DE CONFIRMAR`, `PEQUENIO`). Section 7 of API.md lists them all. Dates are `YYYY-MM-DD`, phone numbers are `+502` followed by 8 digits, and amounts are in GTQ. All `DELETE`s are soft deletes and have a matching `PATCH /:id/restore`.
-- **Booking lifecycle:** pending → confirmed (payment) → `EN ESTANCIA` (check-in) → charges/payments → `FINALIZADA` (check-out, room goes to cleaning). See section 6 of API.md.
-- **Known gaps:** there is no file-upload endpoint, so image fields are text references only. Reports, medication, and feeding have permissions defined but no endpoints yet.
+- **Booking lifecycle:** pending → confirmed (payment) → `EN ESTANCIA` (check-in) → charges/payments → `FINALIZADA` (check-out, room goes to cleaning). Before check-in, the customer can request a cancellation (`/booking-cancellations`), which a receptionist of the booking's branch approves (cancel + refunds) or rejects. See section 6 of API.md.
+- **Files (S3):** photos and the vaccination card go through `PUT`/`DELETE` on `.../profile-picture` and `.../vaccination-card` (multipart, field `file`, max 5 MB), never in create/update bodies. Use `putFile`/`deleteFile` from `api/files.js` (they override the client's JSON Content-Type) and the `<FileUpload>` / `<Avatar>` components. Responses carry signed URLs that expire in 1 hour: render them directly and don't store them.
+- **Known gaps:** reports, medication, and feeding have permissions defined but no endpoints yet.
 
 ## Conventions
 

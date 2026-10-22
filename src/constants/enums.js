@@ -126,6 +126,10 @@ export const MOVEMENT_TYPE_LABELS = Object.freeze({ CARGO: 'Cargo', ABONO: 'Abon
 export const CHECK_IN_STATUS = Object.freeze({ COMPLETADO: 'COMPLETADO', CANCELADO: 'CANCELADO' })
 export const CHECK_IN_STATUS_LABELS = Object.freeze({ COMPLETADO: 'Completado', CANCELADO: 'Cancelado' })
 
+// Solicitud de cancelacion: el cliente la crea y recepcion de la sede la aprueba o rechaza.
+export const CANCELLATION_STATUS = Object.freeze({ PENDIENTE: 'PENDIENTE', APROBADA: 'APROBADA', RECHAZADA: 'RECHAZADA' })
+export const CANCELLATION_STATUS_LABELS = Object.freeze({ PENDIENTE: 'Pendiente', APROBADA: 'Aprobada', RECHAZADA: 'Rechazada' })
+
 export const SERVICE_TYPE = Object.freeze({ ASEO: 'ASEO', RECREACION: 'RECREACION', ALIMENTACION: 'ALIMENTACION' })
 export const SERVICE_TYPE_LABELS = Object.freeze({ ASEO: 'Aseo', RECREACION: 'Recreación', ALIMENTACION: 'Alimentación' })
 
@@ -150,4 +154,5 @@ export const SERVICE_PAYMENT_OPTION_OPTIONS = toOptions(SERVICE_PAYMENT_OPTION, 
 export const MOVEMENT_TYPE_OPTIONS = toOptions(MOVEMENT_TYPE, MOVEMENT_TYPE_LABELS)
 export const CHECK_IN_STATUS_OPTIONS = toOptions(CHECK_IN_STATUS, CHECK_IN_STATUS_LABELS)
 export const SERVICE_TYPE_OPTIONS = toOptions(SERVICE_TYPE, SERVICE_TYPE_LABELS)
+export const CANCELLATION_STATUS_OPTIONS = toOptions(CANCELLATION_STATUS, CANCELLATION_STATUS_LABELS)
 export const TYPE_TRANSACTION_OPTIONS = toOptions(TYPE_TRANSACTION, TYPE_TRANSACTION_LABELS)

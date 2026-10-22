@@ -10,12 +10,14 @@ import PageHeader from '../../../components/PageHeader'
 import QueryState from '../../../components/QueryState'
 import StatusBadge from '../../../components/StatusBadge'
 import { getBookingsByCustomer } from '../../../api/bookings'
+import { BOOKING_STATUS } from '../../../constants/enums'
 import { PERMISSIONS } from '../../../constants/permissions'
 import { formatCurrency, formatDate } from '../../../utils/format'
 
 export default function Bookings() {
   const { customer, hasPermission } = useAuth()
   const canBook = hasPermission(PERMISSIONS.GESTIONAR_RESERVACIONES)
+  const canRequestServices = hasPermission(PERMISSIONS.CARGAR_SERVICIOS_RESERVACION)
   const bookings = useApiQuery(useCallback(() => getBookingsByCustomer(customer.id), [customer.id]))
   const catalog = useRoomCatalog()
 
@@ -70,7 +72,20 @@ export default function Bookings() {
                         <CTableDataCell className={`text-end ${booking.balance > 0 ? 'text-danger fw-semibold' : ''}`}>
                           {formatCurrency(booking.balance)}
                         </CTableDataCell>
-                        <CTableDataCell className="text-end">
+                        <CTableDataCell className="text-end text-nowrap">
+                          {canRequestServices && booking.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && (
+                            <CButton
+                              color="primary"
+                              variant="outline"
+                              size="sm"
+                              className="me-2"
+                              as={Link}
+                              to={`/reservas/${booking.id}/servicios`}
+                              state={{ backTo: '/reservas' }}
+                            >
+                              Solicitar servicio
+                            </CButton>
+                          )}
                           <CButton color="primary" variant="ghost" size="sm" as={Link} to={`/reservas/${booking.id}`}>
                             Ver detalle
                           </CButton>

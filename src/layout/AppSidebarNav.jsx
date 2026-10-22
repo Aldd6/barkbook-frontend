@@ -11,6 +11,7 @@ export default function AppSidebarNav({ sections }) {
     if (item.requiresCustomer && !customer) return false
     if (item.permission) return hasPermission(item.permission)
     if (item.anyOf) return hasAnyPermission(item.anyOf)
+    if (item.allOf) return item.allOf.every(hasPermission)
     return true
   }
 

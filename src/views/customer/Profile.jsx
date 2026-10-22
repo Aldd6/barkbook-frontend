@@ -6,7 +6,8 @@ import PageHeader from '../../components/PageHeader'
 import FormField from '../../components/FormField'
 import ApiErrorAlert from '../../components/ApiErrorAlert'
 import CityPicker from '../../components/CityPicker'
-import { updateCustomer } from '../../api/customers'
+import FileUpload from '../../components/FileUpload'
+import { removeCustomerProfilePicture, updateCustomer, updateCustomerProfilePicture } from '../../api/customers'
 import { maxLength, minLength, nit, phone, required } from '../../utils/validators'
 
 const FIELDS = ['stateId', 'cityId', 'name', 'lastname', 'phoneNumber', 'addressLineOne', 'addressLineTwo', 'nitOrCf', 'nitNumber']
@@ -65,6 +66,21 @@ export default function Profile() {
   return (
     <>
       <PageHeader title="Mi perfil" subtitle={`Usuario ${user.username} · ${user.email}`} />
+      <CCard className="mb-4">
+        <CCardBody>
+          <div className="form-label">Foto de perfil</div>
+          <div className="profile-picture">
+            {/* La foto vive en /auth/me: recargar la sesion actualiza tambien el header. */}
+            <FileUpload
+              url={customer.profilePicture}
+              emptyLabel="Sin foto"
+              onUpload={(file) => updateCustomerProfilePicture(customer.id, file)}
+              onRemove={() => removeCustomerProfilePicture(customer.id)}
+              onChanged={reloadSession}
+            />
+          </div>
+        </CCardBody>
+      </CCard>
       <CCard>
         <CCardBody>
           <CForm onSubmit={onSubmit} noValidate>

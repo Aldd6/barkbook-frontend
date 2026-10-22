@@ -19,6 +19,8 @@ export const PERMISSIONS = Object.freeze({
   HACER_CHECK_OUT: 'Hacer check-out de reservas',
   APLICAR_PAGOS_MOSTRADOR: 'Aplicar pagos cobrados en mostrador',
   CARGAR_SERVICIOS_RESERVACION: 'Cargar servicios a reservacion',
+  SOLICITAR_CANCELACION_RESERVACION: 'Solicitar cancelacion de reservacion',
+  GESTIONAR_CANCELACIONES_RESERVACION: 'Gestionar cancelaciones de reservacion',
   VER_REPORTES_ESTADO_MASCOTA: 'Ver reportes de estado de mascota',
   SUBIR_REPORTES_ESTADO_MASCOTA: 'Subir reportes de estado de mascota',
   SUBIR_INFORMES_SERVICIOS: 'Subir informes de servicios completados',
@@ -26,6 +28,12 @@ export const PERMISSIONS = Object.freeze({
   SUBIR_INFORMES_LIMPIEZA: 'Subir informes de limpieza de habitaculos',
   APLICAR_ALIMENTACION: 'Aplicar alimentacion a mascotas',
 })
+
+// Acceso al tablero de habitaciones fisicas (ruta y menu).
+export const ROOM_OPERATION_PERMISSIONS = Object.freeze([
+  PERMISSIONS.ACTUALIZAR_ESTADO_HABITACIONES,
+  PERMISSIONS.GESTIONAR_HABITACIONES_FISICAS,
+])
 
 // Mismo criterio que authorize.js del back end: el Administrador pasa cualquier chequeo.
 export const ADMIN_ROLE_NAME = 'Administrador'

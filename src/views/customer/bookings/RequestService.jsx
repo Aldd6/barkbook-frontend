@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { CAlert, CBadge, CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormCheck, CRow, CSpinner } from '@coreui/react'
+import { useCallback, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { CAlert, CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormCheck, CRow, CSpinner } from '@coreui/react'
 import useAuth from '../../../auth/useAuth'
 import useForm from '../../../hooks/useForm'
 import useApiQuery from '../../../hooks/useApiQuery'
@@ -9,6 +9,7 @@ import PageHeader from '../../../components/PageHeader'
 import QueryState from '../../../components/QueryState'
 import FormField from '../../../components/FormField'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
+import ConfirmModal from '../../../components/ConfirmModal'
 import StripeProvider from '../../../payments/StripeProvider'
 import CardField from '../../../payments/CardField'
 import useCardPayment from '../../../payments/useCardPayment'
@@ -17,7 +18,7 @@ import { getBooking } from '../../../api/bookings'
 import { getServicesForBooking, chargeServiceToBooking } from '../../../api/services'
 import { getCheckInByBooking } from '../../../api/checkIns'
 import { getPetsByCustomer } from '../../../api/pets'
-import { BOOKING_STATUS, SERVICE_PAYMENT_OPTION, SERVICE_PAYMENT_OPTION_OPTIONS, SERVICE_TYPE_LABELS } from '../../../constants/enums'
+import { BOOKING_STATUS, PET_SPECIES_LABELS, SERVICE_PAYMENT_OPTION, SERVICE_PAYMENT_OPTION_OPTIONS, SERVICE_TYPE_LABELS } from '../../../constants/enums'
 import { maxLength, required } from '../../../utils/validators'
 import { formatCurrency } from '../../../utils/format'
 
@@ -31,7 +32,10 @@ const loadBookingContext = async (bookingId, customerId) => {
 // El cliente carga servicios a su reserva EN ESTANCIA (seccion "Servicios" de API.md).
 export default function RequestService() {
   const { id } = useParams()
+  const { state } = useLocation()
   const { customer } = useAuth()
+  // Vuelve a la pantalla desde la que se llego (Mi estancia o el detalle de la reserva).
+  const backTo = state?.backTo ?? `/reservas/${id}`
   const context = useApiQuery(useCallback(() => loadBookingContext(id, customer.id), [id, customer.id]))
 
   return (
@@ -40,8 +44,8 @@ export default function RequestService() {
         title={`Solicitar servicio · Reserva #${id}`}
         subtitle="Los servicios se prestan en la sede de su reserva."
         actions={
-          <CButton color="secondary" variant="ghost" as={Link} to={`/reservas/${id}`}>
-            Volver a la reserva
+          <CButton color="secondary" variant="ghost" as={Link} to={backTo}>
+            Volver
           </CButton>
         }
       />
@@ -50,37 +54,56 @@ export default function RequestService() {
           (context.data.booking.bookingStatus !== BOOKING_STATUS.EN_ESTANCIA ? (
             <CAlert color="info">Solo puede solicitar servicios mientras la reserva está en estancia.</CAlert>
           ) : (
-            <ServiceCatalog bookingId={id} checkIn={context.data.checkIn} pets={context.data.pets} />
+            <ServiceCatalog bookingId={id} checkIn={context.data.checkIn} pets={context.data.pets} backTo={backTo} />
           ))}
       </QueryState>
     </>
   )
 }
 
-function ServiceCatalog({ bookingId, checkIn, pets }) {
+function ServiceCatalog({ bookingId, checkIn, pets, backTo }) {
   const services = useApiQuery(useCallback(() => getServicesForBooking(bookingId), [bookingId]))
 
   // Solo las mascotas admitidas en el check-in pueden recibir servicios.
   const admittedPets = (checkIn?.pets ?? [])
     .filter((checkInPet) => checkInPet.admitted)
-    .map((checkInPet) => ({ id: checkInPet.petId, name: pets.find((pet) => pet.id === checkInPet.petId)?.name ?? `Mascota #${checkInPet.petId}` }))
+    .map((checkInPet) => {
+      const pet = pets.find((item) => item.id === checkInPet.petId)
+      return { id: checkInPet.petId, name: pet?.name ?? `Mascota #${checkInPet.petId}`, species: pet?.species }
+    })
+  // Todas las mascotas de una reserva son de la especie de su tipo de habitacion.
+  const species = admittedPets.find((pet) => pet.species)?.species
+
+  if (admittedPets.length === 0) {
+    return <CAlert color="warning">Su reserva no tiene mascotas admitidas en el check-in, por lo que no puede solicitar servicios.</CAlert>
+  }
 
   return (
     <QueryState query={services}>
       {services.data?.length === 0 ? (
-        <CAlert color="info">La sede de su reserva no tiene servicios disponibles para su mascota.</CAlert>
+        <CAlert color="info">
+          La sede de su reserva no ofrece servicios para {species ? `la especie ${PET_SPECIES_LABELS[species].toLowerCase()}` : 'su mascota'} en
+          este momento.
+        </CAlert>
       ) : (
         <StripeProvider>
-          <ServiceForm bookingId={bookingId} services={services.data ?? []} admittedPets={admittedPets} />
+          <ServiceForm bookingId={bookingId} services={services.data ?? []} admittedPets={admittedPets} backTo={backTo} />
         </StripeProvider>
       )}
     </QueryState>
   )
 }
 
-function ServiceForm({ bookingId, services, admittedPets }) {
+// Agrupa el catalogo por tipo de servicio, en el orden de SERVICE_TYPE.
+const groupByType = (services) =>
+  Object.keys(SERVICE_TYPE_LABELS)
+    .map((type) => ({ type, services: services.filter((service) => service.serviceType === type) }))
+    .filter((group) => group.services.length > 0)
+
+function ServiceForm({ bookingId, services, admittedPets, backTo }) {
   const navigate = useNavigate()
   const toast = useToast()
+  const [confirming, setConfirming] = useState(false)
   const { createPaymentMethodId } = useCardPayment()
   const { values, setValue, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(
     { serviceId: '', petIds: admittedPets.map((pet) => pet.id), paymentMethod: '', description: '' },
@@ -107,15 +130,24 @@ function ServiceForm({ bookingId, services, admittedPets }) {
     setValue('petIds', next)
   }
 
-  const onSubmit = handleSubmit(async (form) => {
+  const selectedPetNames = admittedPets.filter((pet) => values.petIds.includes(pet.id)).map((pet) => pet.name)
+
+  // Primero valida y pide confirmacion; el cargo se hace al confirmar (con tarjeta se cobra al momento).
+  const onSubmit = handleSubmit(async () => setConfirming(true))
+
+  const onConfirm = handleSubmit(async (form) => {
     const payload = { serviceId: Number(form.serviceId), paymentMethod: form.paymentMethod }
     if (perPet) payload.petIds = form.petIds
     if (form.description.trim()) payload.description = form.description.trim()
-    if (form.paymentMethod === SERVICE_PAYMENT_OPTION.TARJETA) payload.stripePaymentMethodId = await createPaymentMethodId()
-
-    const result = await chargeServiceToBooking(bookingId, payload)
-    toast.success(result.message)
-    navigate(`/reservas/${bookingId}`)
+    // Ante cualquier error se cierra el modal para que se vea el mensaje en el formulario.
+    try {
+      if (form.paymentMethod === SERVICE_PAYMENT_OPTION.TARJETA) payload.stripePaymentMethodId = await createPaymentMethodId()
+      const result = await chargeServiceToBooking(bookingId, payload)
+      toast.success(result.message)
+      navigate(backTo)
+    } finally {
+      setConfirming(false)
+    }
   })
 
   return (
@@ -126,34 +158,34 @@ function ServiceForm({ bookingId, services, admittedPets }) {
           <CCard className="mb-4">
             <CCardHeader className="fw-semibold">1. Servicio</CCardHeader>
             <CCardBody>
-              <CRow className="g-3">
-                {services.map((service) => {
-                  const selected = String(service.id) === values.serviceId
-                  return (
-                    <CCol md={6} key={service.id}>
-                      <button
-                        type="button"
-                        className={`room-option card h-100 w-100 text-start ${selected ? 'room-option-selected' : ''}`}
-                        onClick={() => setValue('serviceId', String(service.id))}
-                        aria-pressed={selected}
-                      >
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start gap-2 mb-1">
-                            <span className="fw-semibold">{service.name}</span>
-                            <CBadge color="light" textColor="dark">
-                              {SERVICE_TYPE_LABELS[service.serviceType]}
-                            </CBadge>
-                          </div>
-                          <div className="text-primary fw-semibold mb-1">
-                            {formatCurrency(service.rate)} {service.isMultiGuest ? 'por servicio' : 'por mascota'}
-                          </div>
-                          {service.description && <div className="small text-body-secondary">{service.description}</div>}
-                        </div>
-                      </button>
-                    </CCol>
-                  )
-                })}
-              </CRow>
+              {groupByType(services).map((group) => (
+                <div key={group.type} className="mb-3">
+                  <div className="small text-uppercase fw-semibold text-body-secondary mb-2">{SERVICE_TYPE_LABELS[group.type]}</div>
+                  <CRow className="g-3">
+                    {group.services.map((service) => {
+                      const selected = String(service.id) === values.serviceId
+                      return (
+                        <CCol md={6} key={service.id}>
+                          <button
+                            type="button"
+                            className={`room-option card h-100 w-100 text-start ${selected ? 'room-option-selected' : ''}`}
+                            onClick={() => setValue('serviceId', String(service.id))}
+                            aria-pressed={selected}
+                          >
+                            <div className="card-body">
+                              <div className="fw-semibold mb-1">{service.name}</div>
+                              <div className="text-primary fw-semibold mb-1">
+                                {formatCurrency(service.rate)} {service.isMultiGuest ? 'por servicio' : 'por mascota'}
+                              </div>
+                              {service.description && <div className="small text-body-secondary">{service.description}</div>}
+                            </div>
+                          </button>
+                        </CCol>
+                      )
+                    })}
+                  </CRow>
+                </div>
+              ))}
               {fieldError('serviceId') && <div className="invalid-feedback d-block">{fieldError('serviceId')}</div>}
             </CCardBody>
           </CCard>
@@ -246,6 +278,25 @@ function ServiceForm({ bookingId, services, admittedPets }) {
           </CCard>
         </CCol>
       </CRow>
+
+      <ConfirmModal
+        visible={confirming}
+        title="Confirmar servicio"
+        confirmLabel={payWithCard ? `Pagar ${formatCurrency(amount)}` : 'Cargar a mi cuenta'}
+        loading={submitting}
+        onConfirm={onConfirm}
+        onClose={() => setConfirming(false)}
+      >
+        <p>
+          <strong>{selectedService?.name}</strong>
+          {perPet && selectedPetNames.length > 0 && <> para {selectedPetNames.join(', ')}</>} por <strong>{formatCurrency(amount)}</strong>.
+        </p>
+        <p className="mb-0 text-body-secondary">
+          {payWithCard
+            ? 'El monto se cobrará de inmediato a su tarjeta.'
+            : 'El monto se sumará al saldo de su reserva y se cobrará en recepción al hacer el check-out.'}
+        </p>
+      </ConfirmModal>
     </CForm>
   )
 }

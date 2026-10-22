@@ -2,13 +2,14 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CButton, CCard, CCardBody, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilPaw, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import useAuth from '../../../auth/useAuth'
 import useApiQuery from '../../../hooks/useApiQuery'
 import useToast from '../../../components/toast/useToast'
 import PageHeader from '../../../components/PageHeader'
 import QueryState from '../../../components/QueryState'
 import ConfirmModal from '../../../components/ConfirmModal'
+import Avatar from '../../../components/Avatar'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
 import { deletePet, getPetsByCustomer } from '../../../api/pets'
 import { toApiError } from '../../../api/errors'
@@ -82,7 +83,8 @@ export default function Pets() {
                   {pets.data?.map((pet) => (
                     <CTableRow key={pet.id}>
                       <CTableDataCell>
-                        <Link to={`/mascotas/${pet.id}`} className="fw-semibold">
+                        <Link to={`/mascotas/${pet.id}`} className="fw-semibold d-inline-flex align-items-center gap-2">
+                          <Avatar src={pet.profilePicture} icon={cilPaw} />
                           {pet.name}
                         </Link>
                       </CTableDataCell>

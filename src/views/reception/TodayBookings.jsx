@@ -10,7 +10,7 @@ import { getBookings } from '../../api/bookings'
 import { getCustomers } from '../../api/customers'
 import { BOOKING_STATUS, BOOKING_STATUS_OPTIONS } from '../../constants/enums'
 import { formatDate, todayISO } from '../../utils/format'
-import { customerName, isActiveOn, isArrivalDue, isDepartureDue } from './frontDesk'
+import { customerName, isActiveOn, isArrivalDue, isDepartureDue, isUpcoming } from './frontDesk'
 
 // GET /bookings no filtra por fecha: se cargan todas y se filtran aqui.
 const loadFrontDesk = () =>
@@ -21,6 +21,7 @@ const loadFrontDesk = () =>
 
 const TABS = [
   { key: 'arrivals', label: 'Llegadas', empty: 'No hay llegadas pendientes para hoy.' },
+  { key: 'upcoming', label: 'Próximas', empty: 'No hay reservas por llegar en los próximos días.' },
   { key: 'departures', label: 'Salidas', empty: 'No hay salidas pendientes para hoy.' },
   { key: 'inStay', label: 'En estancia', empty: 'No hay mascotas hospedadas.' },
   { key: 'all', label: 'Buscar', empty: 'No hay reservas que coincidan con la búsqueda.' },
@@ -30,7 +31,8 @@ export default function TodayBookings() {
   const data = useApiQuery(loadFrontDesk)
   const catalog = useRoomCatalog()
   const [activeTab, setActiveTab] = useState('arrivals')
-  const [filters, setFilters] = useState({ day: todayISO(), status: '', search: '' })
+  // Sin fecha por defecto: la busqueda debe encontrar tambien reservas futuras o pasadas.
+  const [filters, setFilters] = useState({ day: '', status: '', search: '' })
   const [toPay, setToPay] = useState(null)
   const today = todayISO()
 
@@ -39,6 +41,7 @@ export default function TodayBookings() {
 
   const byTab = {
     arrivals: bookings.filter((booking) => isArrivalDue(booking, today)),
+    upcoming: bookings.filter((booking) => isUpcoming(booking, today)),
     departures: bookings.filter((booking) => isDepartureDue(booking, today)),
     inStay: bookings.filter((booking) => booking.bookingStatus === BOOKING_STATUS.EN_ESTANCIA),
     all: bookings.filter((booking) => {

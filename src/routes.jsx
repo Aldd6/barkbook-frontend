@@ -20,13 +20,22 @@ import Bookings from './views/customer/bookings/Bookings'
 import NewBooking from './views/customer/bookings/NewBooking'
 import BookingDetail from './views/customer/bookings/BookingDetail'
 import RequestService from './views/customer/bookings/RequestService'
+import MyStay from './views/customer/bookings/MyStay'
 import Profile from './views/customer/Profile'
 import TodayBookings from './views/reception/TodayBookings'
 import PendingBookings from './views/reception/PendingBookings'
 import FrontDeskBooking from './views/reception/FrontDeskBooking'
 import CheckIn from './views/reception/CheckIn'
 import CheckOut from './views/reception/CheckOut'
-import { PERMISSIONS } from './constants/permissions'
+import Cancellations from './views/reception/Cancellations'
+import Rooms from './views/operation/Rooms'
+import Branches from './views/admin/Branches'
+import Employees from './views/admin/Employees'
+import RoomTypes from './views/admin/RoomTypes'
+import RoomBranches from './views/admin/RoomBranches'
+import Services from './views/admin/Services'
+import ServiceBranches from './views/admin/ServiceBranches'
+import { PERMISSIONS, ROOM_OPERATION_PERMISSIONS } from './constants/permissions'
 
 // Cada ruta exige el mismo permiso que el endpoint principal que usa en el back end.
 export default function AppRoutes() {
@@ -62,6 +71,10 @@ export default function AppRoutes() {
               <Route element={<RequirePermission permission={PERMISSIONS.CONSULTAR_CUENTA_RESERVACION} />}>
                 <Route path="/reservas" element={<Bookings />} />
                 <Route path="/reservas/:id" element={<BookingDetail />} />
+                {/* Mi estancia lista las reservas del cliente y el catalogo de servicios de cada una */}
+                <Route element={<RequirePermission permission={PERMISSIONS.CARGAR_SERVICIOS_RESERVACION} />}>
+                  <Route path="/mi-estancia" element={<MyStay />} />
+                </Route>
               </Route>
               <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_RESERVACIONES} />}>
                 <Route path="/reservas/nueva" element={<NewBooking />} />
@@ -85,6 +98,34 @@ export default function AppRoutes() {
                   <Route path="/recepcion/reservas/:id/check-out" element={<CheckOut />} />
                 </Route>
               </Route>
+            </Route>
+
+            {/* La API filtra las solicitudes por la sede del empleado */}
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_CANCELACIONES_RESERVACION} />}>
+              <Route path="/recepcion/cancelaciones" element={<Cancellations />} />
+            </Route>
+
+            {/* Operacion: GET /room-inventory solo pide sesion; la pantalla sirve a quien cambia estados o gestiona habitaciones */}
+            <Route element={<RequirePermission anyOf={ROOM_OPERATION_PERMISSIONS} />}>
+              <Route path="/operacion/habitaciones" element={<Rooms />} />
+            </Route>
+
+            {/* Administracion */}
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_SEDES} />}>
+              <Route path="/admin/sedes" element={<Branches />} />
+            </Route>
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_TIPOS_HABITACION} />}>
+              <Route path="/admin/tipos-habitacion" element={<RoomTypes />} />
+            </Route>
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_HABITACIONES_SEDE} />}>
+              <Route path="/admin/habitaciones-sede" element={<RoomBranches />} />
+            </Route>
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_CATALOGO_SERVICIOS} />}>
+              <Route path="/admin/servicios" element={<Services />} />
+              <Route path="/admin/servicios-sede" element={<ServiceBranches />} />
+            </Route>
+            <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_EMPLEADOS} />}>
+              <Route path="/admin/empleados" element={<Employees />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

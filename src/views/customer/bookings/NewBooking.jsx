@@ -20,18 +20,9 @@ import { createBooking } from '../../../api/bookings'
 import { PAYMENT_METHOD, PAYMENT_METHOD_OPTIONS, PET_SPECIES_LABELS } from '../../../constants/enums'
 import { date, required } from '../../../utils/validators'
 import { formatCurrency, nightsBetween, todayISO } from '../../../utils/format'
+import { ROOM_AMENITIES } from '../../../constants/roomTypes'
 
 const FIELDS = ['branchId', 'branchRoomId', 'checkInDate', 'checkOutDate', 'petIds', 'paymentMethod', 'stripePaymentMethodId']
-
-const AMENITIES = [
-  ['hasAC', 'Aire acondicionado'],
-  ['isSoundproofed', 'Insonorizada'],
-  ['hasCCTV', 'Cámaras'],
-  ['hasOrthopedicBed', 'Cama ortopédica'],
-  ['hasPrivateYard', 'Patio privado'],
-  ['hasSharedYard', 'Patio compartido'],
-  ['hasToys', 'Juguetes'],
-]
 
 const RULES = {
   branchId: [required('Seleccione una sede.')],
@@ -169,7 +160,7 @@ function BookingForm({ catalog, pets }) {
                           </div>
                           {roomType.description && <div className="small mb-2">{roomType.description}</div>}
                           <div className="d-flex flex-wrap gap-1">
-                            {AMENITIES.filter(([key]) => roomType[key]).map(([key, label]) => (
+                            {ROOM_AMENITIES.filter(([key]) => roomType[key]).map(([key, label]) => (
                               <CBadge key={key} color="secondary" className="fw-normal">
                                 {label}
                               </CBadge>

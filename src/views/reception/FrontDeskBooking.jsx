@@ -11,20 +11,24 @@ import BillTable from '../../components/BillTable'
 import BookingInfoCard from '../../components/booking/BookingInfoCard'
 import StayInfoCard from '../../components/booking/StayInfoCard'
 import ConfirmPaymentModal from '../../components/booking/ConfirmPaymentModal'
-import { BOOKING_STATUS, KINSHIP_LABELS } from '../../constants/enums'
+import { getCancellationsByBooking } from '../../api/bookingCancellations'
+import { BOOKING_STATUS, CANCELLATION_STATUS, KINSHIP_LABELS } from '../../constants/enums'
 import { PERMISSIONS } from '../../constants/permissions'
-import { formatCurrency, todayISO } from '../../utils/format'
-import { customerName, isArrivalDue, loadBookingFile, petNameFrom } from './frontDesk'
+import { formatCurrency, formatDate, formatDateTime, todayISO } from '../../utils/format'
+import { customerName, isArrivalDue, isUpcoming, loadBookingFile, petNameFrom } from './frontDesk'
 
 export default function FrontDeskBooking() {
   const { id } = useParams()
   const { hasPermission } = useAuth()
   const file = useApiQuery(useCallback(() => loadBookingFile(id), [id]))
   const catalog = useRoomCatalog()
+  const cancellations = useApiQuery(useCallback(() => getCancellationsByBooking(id), [id]))
   const [toPay, setToPay] = useState(null)
 
   const booking = file.data?.booking
-  const canCheckIn = booking && isArrivalDue(booking, todayISO()) && hasPermission(PERMISSIONS.HACER_CHECK_IN)
+  // Con una solicitud de cancelacion pendiente el back end rechaza el check-in hasta resolverla.
+  const pendingCancellation = cancellations.data?.find((item) => item.status === CANCELLATION_STATUS.PENDIENTE)
+  const canCheckIn = booking && !pendingCancellation && isArrivalDue(booking, todayISO()) && hasPermission(PERMISSIONS.HACER_CHECK_IN)
   const canCheckOut = booking?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && hasPermission(PERMISSIONS.HACER_CHECK_OUT)
   const canPay = booking?.bookingStatus === BOOKING_STATUS.PENDIENTE && booking.balance > 0 && hasPermission(PERMISSIONS.APLICAR_PAGOS_MOSTRADOR)
 
@@ -68,6 +72,20 @@ export default function FrontDeskBooking() {
           )}
           {booking.bookingStatus === BOOKING_STATUS.PENDIENTE && (
             <CAlert color="warning">La reserva está pendiente de pago ({formatCurrency(booking.balance)}). Debe pagarse antes del check-in.</CAlert>
+          )}
+
+          {pendingCancellation && (
+            <CAlert color="warning">
+              El cliente solicitó cancelar esta reserva el {formatDateTime(pendingCancellation.requestedAt)}: <em>{pendingCancellation.reason}</em>.{' '}
+              {hasPermission(PERMISSIONS.GESTIONAR_CANCELACIONES_RESERVACION) ? (
+                <Link to="/recepcion/cancelaciones">Resolver la solicitud</Link>
+              ) : (
+                'Debe resolverse antes del check-in.'
+              )}
+            </CAlert>
+          )}
+          {isUpcoming(booking, todayISO()) && (
+            <CAlert color="info">El check-in de esta reserva estará disponible a partir del {formatDate(booking.checkInDate)}.</CAlert>
           )}
 
           <CRow className="g-4">

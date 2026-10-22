@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CAlert, CButton, CCard, CCardBody, CCardHeader, CCol, CRow } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
@@ -12,12 +12,14 @@ import StatusBadge from '../../../components/StatusBadge'
 import BillTable from '../../../components/BillTable'
 import BookingInfoCard from '../../../components/booking/BookingInfoCard'
 import StayInfoCard from '../../../components/booking/StayInfoCard'
+import CancellationRequestModal from '../../../components/booking/CancellationRequestModal'
 import { getBooking } from '../../../api/bookings'
 import { getPetsByCustomer } from '../../../api/pets'
 import { getStayByBooking } from '../../../api/checkOuts'
-import { BOOKING_STATUS } from '../../../constants/enums'
+import { getCancellationsByBooking } from '../../../api/bookingCancellations'
+import { BOOKING_STATUS, CANCELLATION_STATUS } from '../../../constants/enums'
 import { PERMISSIONS } from '../../../constants/permissions'
-import { formatCurrency } from '../../../utils/format'
+import { formatCurrency, formatDateTime } from '../../../utils/format'
 
 export default function BookingDetail() {
   const { id } = useParams()
@@ -25,9 +27,19 @@ export default function BookingDetail() {
   const booking = useApiQuery(useCallback(() => getBooking(id), [id]))
   const stay = useApiQuery(useCallback(() => getStayByBooking(id), [id]))
   const pets = useApiQuery(useCallback(() => getPetsByCustomer(customer.id), [customer.id]))
+  const cancellations = useApiQuery(useCallback(() => getCancellationsByBooking(id), [id]))
   const catalog = useRoomCatalog()
+  const [requestingCancel, setRequestingCancel] = useState(false)
 
   const petName = (petId) => pets.data?.find((pet) => pet.id === petId)?.name ?? `Mascota #${petId}`
+  // La API devuelve las solicitudes de la mas reciente a la mas antigua.
+  const latestCancellation = cancellations.data?.[0]
+  const cancellable = [BOOKING_STATUS.CONFIRMADA, BOOKING_STATUS.PENDIENTE].includes(booking.data?.bookingStatus)
+  const canRequestCancel =
+    cancellable &&
+    cancellations.data !== undefined &&
+    latestCancellation?.status !== CANCELLATION_STATUS.PENDIENTE &&
+    hasPermission(PERMISSIONS.SOLICITAR_CANCELACION_RESERVACION)
   const canRequestServices =
     booking.data?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && hasPermission(PERMISSIONS.CARGAR_SERVICIOS_RESERVACION)
 
@@ -46,6 +58,11 @@ export default function BookingDetail() {
                 <CButton color="secondary" variant="ghost" as={Link} to="/reservas">
                   Volver
                 </CButton>
+                {canRequestCancel && (
+                  <CButton color="danger" variant="outline" onClick={() => setRequestingCancel(true)}>
+                    Solicitar cancelación
+                  </CButton>
+                )}
                 {canRequestServices && (
                   <CButton color="primary" as={Link} to={`/reservas/${id}/servicios`}>
                     <CIcon icon={cilPlus} className="me-1" />
@@ -57,6 +74,7 @@ export default function BookingDetail() {
           />
 
           <StatusNotice booking={booking.data} />
+          {cancellable && <CancellationNotice cancellation={latestCancellation} />}
 
           <CRow className="g-4">
             <CCol lg={5}>
@@ -72,10 +90,38 @@ export default function BookingDetail() {
               </CCard>
             </CCol>
           </CRow>
+
+          <CancellationRequestModal
+            key={requestingCancel ? 'open' : 'closed'}
+            booking={booking.data}
+            visible={requestingCancel}
+            onClose={() => setRequestingCancel(false)}
+            onRequested={cancellations.reload}
+          />
         </>
       )}
     </QueryState>
   )
+}
+
+// Estado de la ultima solicitud de cancelacion mientras la reserva sigue vigente.
+function CancellationNotice({ cancellation }) {
+  if (cancellation?.status === CANCELLATION_STATUS.PENDIENTE) {
+    return (
+      <CAlert color="warning">
+        Solicitó la cancelación de esta reserva el {formatDateTime(cancellation.requestedAt)}. Recepción de la sede la está revisando.
+      </CAlert>
+    )
+  }
+  if (cancellation?.status === CANCELLATION_STATUS.RECHAZADA) {
+    return (
+      <CAlert color="secondary">
+        Su solicitud de cancelación fue rechazada{cancellation.resolutionNotes ? `: ${cancellation.resolutionNotes}` : '.'} Puede volver a
+        solicitarla si lo necesita.
+      </CAlert>
+    )
+  }
+  return null
 }
 
 function StatusNotice({ booking }) {

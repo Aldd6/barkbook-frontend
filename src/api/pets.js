@@ -1,4 +1,5 @@
 import client from './client'
+import { deleteFile, putFile } from './files'
 
 // Consultas: devuelven el recurso. Mutaciones: devuelven el body completo ({ message, pet }).
 
@@ -11,3 +12,12 @@ export const createPet = (data) => client.post('/pets', data).then((r) => r.data
 export const updatePet = (id, data) => client.put(`/pets/${id}`, data).then((r) => r.data)
 
 export const deletePet = (id) => client.delete(`/pets/${id}`).then((r) => r.data)
+
+// Foto (jpeg, png, webp) y carne de vacunacion (ademas pdf). Devuelven { message, pet }.
+export const updatePetProfilePicture = (id, file) => putFile(`/pets/${id}/profile-picture`, file)
+
+export const removePetProfilePicture = (id) => deleteFile(`/pets/${id}/profile-picture`)
+
+export const updatePetVaccinationCard = (id, file) => putFile(`/pets/${id}/vaccination-card`, file)
+
+export const removePetVaccinationCard = (id) => deleteFile(`/pets/${id}/vaccination-card`)
