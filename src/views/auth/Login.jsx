@@ -8,7 +8,6 @@ import { required } from '../../utils/validators'
 
 const FIELDS = ['identifier', 'password']
 
-// POST /auth/signin acepta username o email: si el texto tiene "@" se envia como email.
 export default function Login() {
   const { login } = useAuth()
   const location = useLocation()
@@ -23,7 +22,6 @@ export default function Login() {
     },
   )
 
-  // Al iniciar sesion, GuestOnly redirige a la pagina de origen o al inicio.
   const onSubmit = handleSubmit(async ({ identifier, password }) => {
     const value = identifier.trim()
     const credentials = value.includes('@') ? { email: value, password } : { username: value, password }

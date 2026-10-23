@@ -12,11 +12,10 @@ import BranchModal from './BranchModal'
 import { deleteBranch, getBranches } from '../../api/branches'
 import { toApiError } from '../../api/errors'
 
-// Sedes del hotel (P: Gestionar sedes). Las habitaciones y servicios de cada sede se configuran aparte.
 export default function Branches() {
   const toast = useToast()
   const branches = useApiQuery(getBranches)
-  const [editing, setEditing] = useState(undefined) // undefined = cerrado, null = nueva
+  const [editing, setEditing] = useState(undefined)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)

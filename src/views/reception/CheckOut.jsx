@@ -24,18 +24,15 @@ import { formatCurrency } from '../../utils/format'
 import { maxLength } from '../../utils/validators'
 import { customerName, loadBookingFile, petNameFrom } from './frontDesk'
 
-// Flujo de API.md: GET /service-orders/booking/:id -> resolver las PENDIENTE -> GET /bookings/:id
-// -> mostrar bill y balance -> si balance > 0, pedir metodo de pago -> POST /check-outs con payment.
 export default function CheckOut() {
   const { id } = useParams()
   const { hasPermission } = useAuth()
   const file = useApiQuery(useCallback(() => loadBookingFile(id), [id]))
   const orders = useApiQuery(useCallback(() => getServiceOrdersByBooking(id), [id]))
   const catalog = useRoomCatalog()
-  const [action, setAction] = useState(null) // { order, complete }
+  const [action, setAction] = useState(null)
   const booking = file.data?.booking
   const pendingOrders = orders.data?.filter((order) => order.status === SERVICE_ORDER_STATUS.PENDIENTE) ?? []
-  // Completar carga el servicio a la cuenta: hay que volver a pedir la reserva porque el balance pudo subir.
   const onOrderResolved = () => {
     orders.reload()
     file.reload()
@@ -91,7 +88,6 @@ export default function CheckOut() {
                 <CheckOutForm
                   booking={booking}
                   checkIn={file.data.checkIn}
-                  // Si la consulta falla no se bloquea: el back end igual valida las ordenes pendientes.
                   ordersLoaded={orders.data !== undefined || Boolean(orders.error)}
                   pendingOrders={pendingOrders.length}
                 />
@@ -116,7 +112,6 @@ function CheckOutForm({ booking, checkIn, ordersLoaded, pendingOrders }) {
   const { hasPermission } = useAuth()
   const hasBalance = booking.balance > 0
   const canCollect = hasPermission(PERMISSIONS.APLICAR_PAGOS_MOSTRADOR)
-  // El back end responde 409 si quedan ordenes de servicio PENDIENTE.
   const blockedByOrders = !ordersLoaded || pendingOrders > 0
 
   const { values, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(
@@ -126,7 +121,6 @@ function CheckOutForm({ booking, checkIn, ordersLoaded, pendingOrders }) {
         ...(hasBalance ? counterPaymentRules : {}),
         observations: [maxLength(255, 'Las observaciones no pueden exceder los 255 caracteres.')],
       },
-      // Los errores del pago vienen como payment.methodPayment, payment.reference...
       fieldMap: { 'payment.methodPayment': 'methodPayment', 'payment.reference': 'reference', 'payment.description': 'description' },
     },
   )

@@ -1,9 +1,6 @@
 import { CAlert } from '@coreui/react'
 import { ERROR_FLAGS } from '../api/errors'
 
-// Muestra el message de la API tal como viene.
-// Si se pasan `fields` (los campos que el formulario muestra), lista aparte los details[]
-// que no tienen un campo visible donde mostrarse.
 export default function ApiErrorAlert({ error, fields, className = '' }) {
   if (!error) return null
 

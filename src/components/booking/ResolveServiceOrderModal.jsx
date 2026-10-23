@@ -18,8 +18,6 @@ const rulesFor = (completing) => ({
       ],
 })
 
-// PATCH /service-orders/:id/complete (informe opcional) o /cancel (motivo obligatorio).
-// `action`: { order, complete: boolean } o null (cerrado). Renderizar con key para reiniciar.
 export default function ResolveServiceOrderModal({ action, onClose, onResolved }) {
   const toast = useToast()
   const completing = action?.complete ?? false

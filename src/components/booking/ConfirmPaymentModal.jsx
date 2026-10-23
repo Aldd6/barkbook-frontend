@@ -6,9 +6,6 @@ import { COUNTER_PAYMENT_FIELDS, counterPaymentRules, emptyCounterPayment, toCou
 import { confirmBookingPayment } from '../../api/bookings'
 import { formatCurrency } from '../../utils/format'
 
-// PATCH /bookings/:id/confirm-payment: registra un ABONO por todo el saldo pendiente.
-// En PENDIENTE DE CONFIRMAR la reserva pasa a CONFIRMADA; en EN ESTANCIA salda servicios.
-// Renderizar con key={booking?.id} para que el formulario se reinicie con cada reserva.
 export default function ConfirmPaymentModal({ booking, onClose, onPaid }) {
   const toast = useToast()
   const { values, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(emptyCounterPayment, {

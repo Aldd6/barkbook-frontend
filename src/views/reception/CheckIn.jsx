@@ -16,6 +16,7 @@ import {
   CRow,
   CSpinner,
 } from '@coreui/react'
+import { cilDescription, cilPaw } from '@coreui/icons'
 import useAuth from '../../auth/useAuth'
 import useApiQuery from '../../hooks/useApiQuery'
 import useForm from '../../hooks/useForm'
@@ -27,16 +28,31 @@ import FormField from '../../components/FormField'
 import ApiErrorAlert from '../../components/ApiErrorAlert'
 import ConfirmModal from '../../components/ConfirmModal'
 import ConfirmPaymentModal from '../../components/booking/ConfirmPaymentModal'
-import { createCheckIn, getAvailableRoomsForBooking } from '../../api/checkIns'
-import { BOOKING_STATUS, PET_SPECIES_LABELS, ROOM_STATUS_LABELS } from '../../constants/enums'
+import Avatar from '../../components/Avatar'
+import FileUpload from '../../components/FileUpload'
+import { DOCUMENT_TYPES } from '../../api/files'
+import { createCheckIn, getAvailableRoomsForBooking, getBookingPetsForCheckIn } from '../../api/checkIns'
+import {
+  BOOKING_STATUS,
+  PET_SIZE_LABELS,
+  PET_SPECIES_LABELS,
+  ROOM_STATUS_LABELS,
+  SEX_LABELS,
+  UNIT_MEASURE_WEIGHT_PET_LABELS,
+  VACCINE_USE_LABELS,
+} from '../../constants/enums'
 import { PERMISSIONS } from '../../constants/permissions'
-import { formatCurrency, formatDate, todayISO } from '../../utils/format'
+import { formatAge, formatCurrency, formatDate, todayISO, yesNo } from '../../utils/format'
 import { maxLength } from '../../utils/validators'
-import { customerName, isArrivalDue, loadBookingFile, petNameFrom } from './frontDesk'
+import { customerName, isArrivalDue, loadBookingFile } from './frontDesk'
 
 const loadCheckInData = async (bookingId) => {
-  const [file, rooms] = await Promise.all([loadBookingFile(bookingId), getAvailableRoomsForBooking(bookingId)])
-  return { ...file, rooms }
+  const [file, rooms, bookingPets] = await Promise.all([
+    loadBookingFile(bookingId),
+    getAvailableRoomsForBooking(bookingId),
+    getBookingPetsForCheckIn(bookingId),
+  ])
+  return { ...file, rooms, bookingPets }
 }
 
 export default function CheckIn() {
@@ -85,7 +101,6 @@ function CheckInBody({ data, catalog, canPay, onPay }) {
       </CAlert>
     )
   }
-  // El back end exige saldo 0 antes del check-in.
   if (booking.balance > 0) {
     return (
       <CAlert color="warning" className="d-flex flex-wrap align-items-center justify-content-between gap-2">
@@ -103,7 +118,7 @@ function CheckInBody({ data, catalog, canPay, onPay }) {
     )
   }
 
-  return <CheckInForm booking={booking} pets={data.pets} rooms={rooms} catalog={catalog} />
+  return <CheckInForm booking={booking} bookingPets={data.bookingPets} rooms={rooms} catalog={catalog} />
 }
 
 const buildRules = (values) => {
@@ -130,16 +145,15 @@ const buildRules = (values) => {
   return rules
 }
 
-function CheckInForm({ booking, pets, rooms, catalog }) {
+function CheckInForm({ booking, bookingPets, rooms, catalog }) {
   const navigate = useNavigate()
   const toast = useToast()
-  const petName = petNameFrom(pets)
   const { roomType } = describeRoomBranch(catalog, booking.branchRoomId)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const { values, setValue, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm(
     {
-      pets: booking.pets.map((bookingPet) => ({ bookingPetId: bookingPet.id, petId: bookingPet.petId, admitted: true, nonadmissionReason: '' })),
+      pets: bookingPets.map(({ bookingPetId, pet, vaccines }) => ({ bookingPetId, pet, vaccines, admitted: true, nonadmissionReason: '' })),
       customerAcceptsPartialAdmission: '',
       roomNumber: '',
       observations: '',
@@ -176,7 +190,6 @@ function CheckInForm({ booking, pets, rooms, catalog }) {
     navigate(`/recepcion/reservas/${booking.id}`)
   }
 
-  // Si el check-in cancela la reserva, primero se pide confirmacion; el modal envia con confirmAndSubmit.
   const onSubmit = handleSubmit(async (form) => {
     if (willCancel) {
       setConfirmOpen(true)
@@ -196,11 +209,15 @@ function CheckInForm({ booking, pets, rooms, catalog }) {
           <CCard className="mb-4">
             <CCardHeader className="fw-semibold">Admisión de mascotas</CCardHeader>
             <CCardBody>
+              <p className="small text-body-secondary">Verifique los datos y el carné de vacunación de cada mascota antes de admitirla.</p>
               <CListGroup flush>
                 {values.pets.map((pet, index) => (
-                  <CListGroupItem key={pet.bookingPetId} className="px-0">
+                  <CListGroupItem key={pet.bookingPetId} className="px-0 py-3">
                     <div className="d-flex justify-content-between align-items-center gap-2">
-                      <span className="fw-semibold">{petName(pet.petId)}</span>
+                      <div className="d-flex align-items-center gap-2">
+                        <Avatar src={pet.pet.profilePicture} icon={cilPaw} alt={pet.pet.name} />
+                        <span className="fw-semibold">{pet.pet.name}</span>
+                      </div>
                       <CFormSwitch
                         id={`admitted-${pet.bookingPetId}`}
                         label={pet.admitted ? 'Admitida' : 'No admitida'}
@@ -208,6 +225,7 @@ function CheckInForm({ booking, pets, rooms, catalog }) {
                         onChange={(event) => updatePet(index, { admitted: event.target.checked })}
                       />
                     </div>
+                    <PetCheckInDetails pet={pet.pet} vaccines={pet.vaccines} />
                     {!pet.admitted && (
                       <FormField
                         name={`pets.${index}.nonadmissionReason`}
@@ -323,5 +341,48 @@ function CheckInForm({ booking, pets, rooms, catalog }) {
         El check-in quedará cancelado, la reserva #{booking.id} pasará a <strong>Cancelada</strong> y se reembolsarán los pagos. ¿Desea continuar?
       </ConfirmModal>
     </CForm>
+  )
+}
+
+function PetCheckInDetails({ pet, vaccines }) {
+  return (
+    <CRow className="g-3 mt-1">
+      <CCol sm={7}>
+        <CRow className="g-2 small">
+          <PetInfo label="Especie" value={PET_SPECIES_LABELS[pet.species]} />
+          <PetInfo label="Sexo" value={SEX_LABELS[pet.sex]} />
+          <PetInfo label="Tamaño" value={PET_SIZE_LABELS[pet.size]} />
+          <PetInfo label="Edad" value={formatAge(pet.birthday)} />
+          <PetInfo label="Peso" value={`${pet.actualWeight} ${UNIT_MEASURE_WEIGHT_PET_LABELS[pet.unitOfMeasureWeight]?.toLowerCase()}`} />
+          <PetInfo label="Sociabilidad" value={`${pet.sociabilityLevel} de 5`} />
+          <PetInfo label="Esterilizado(a)" value={yesNo(pet.isNeutered)} />
+        </CRow>
+        <div className="small text-body-secondary mt-3 mb-1">Vacunas registradas</div>
+        {vaccines.length === 0 ? (
+          <div className="small">Sin vacunas registradas.</div>
+        ) : (
+          <ul className="small ps-3 mb-0">
+            {vaccines.map((vaccine) => (
+              <li key={vaccine.id}>
+                <span className="fw-semibold">{vaccine.vaccineName}</span> · {VACCINE_USE_LABELS[vaccine.vaccineUse]} · {formatDate(vaccine.dateOfPlacement)}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CCol>
+      <CCol sm={5}>
+        <div className="small text-body-secondary mb-1">Carné de vacunación</div>
+        <FileUpload url={pet.vaccinationCard} types={DOCUMENT_TYPES} canEdit={false} icon={cilDescription} emptyLabel="Sin carné" />
+      </CCol>
+    </CRow>
+  )
+}
+
+function PetInfo({ label, value }) {
+  return (
+    <CCol xs={6} md={4}>
+      <div className="text-body-secondary">{label}</div>
+      <div className="fw-semibold">{value}</div>
+    </CCol>
   )
 }

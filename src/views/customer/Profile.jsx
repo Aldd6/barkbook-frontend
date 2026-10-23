@@ -34,7 +34,6 @@ const toFormValues = (customer) => ({
   nitNumber: customer.nitNumber ?? '',
 })
 
-// PUT /customers/:id. El municipio solo se envia si el cliente elige uno nuevo.
 const toPayload = (values) => {
   const payload = {
     name: values.name.trim(),
@@ -56,7 +55,6 @@ export default function Profile() {
     rules: buildRules,
   })
 
-  // Recarga /auth/me para que el header y el resto de la app vean los datos nuevos.
   const onSubmit = handleSubmit(async (form) => {
     const result = await updateCustomer(customer.id, toPayload(form))
     toast.success(result.message)
@@ -70,7 +68,6 @@ export default function Profile() {
         <CCardBody>
           <div className="form-label">Foto de perfil</div>
           <div className="profile-picture">
-            {/* La foto vive en /auth/me: recargar la sesion actualiza tambien el header. */}
             <FileUpload
               url={customer.profilePicture}
               emptyLabel="Sin foto"

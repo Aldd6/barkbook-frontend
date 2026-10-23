@@ -33,7 +33,6 @@ const buildRules = (values) => ({
   termsAcceptance: [(value) => (value ? null : 'Debe aceptar los terminos y condiciones para continuar.')],
 })
 
-// Body de POST /customers. Los opcionales vacios no se envian (el back end rechaza "").
 const toCustomerPayload = (values) => {
   const payload = {
     cityId: Number(values.cityId),
@@ -70,7 +69,6 @@ export default function CompleteProfile() {
     { rules: buildRules },
   )
 
-  // completeProfile reemplaza el token y recarga /auth/me; RequireIncompleteProfile lleva al inicio.
   const onSubmit = handleSubmit(async (form) => {
     await completeProfile(toCustomerPayload(form))
   })

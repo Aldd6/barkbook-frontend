@@ -20,9 +20,6 @@ import { ROOM_STATUS_ORDER, groupRooms } from './roomInventory'
 
 const EMPTY_FILTERS = { branchId: '', roomTypeId: '', status: '', search: '' }
 
-// Tablero de habitaciones fisicas por sede y tipo. Quien tiene "Actualizar estado de habitaciones"
-// cambia estados (p. ej. LIMPIEZA -> DISPONIBLE tras el check-out); "Gestionar habitaciones fisicas"
-// genera, archiva y restaura habitaciones.
 export default function Rooms() {
   const { hasPermission } = useAuth()
   const toast = useToast()
@@ -39,7 +36,6 @@ export default function Rooms() {
   const canUpdate = hasPermission(PERMISSIONS.ACTUALIZAR_ESTADO_HABITACIONES)
   const canManage = hasPermission(PERMISSIONS.GESTIONAR_HABITACIONES_FISICAS)
 
-  // El listado de archivadas exige "Gestionar habitaciones fisicas"; sin el no se pide.
   const archived = useApiQuery(useCallback(() => (canManage ? getArchivedRoomInventory() : Promise.resolve([])), [canManage]))
   const reloadAll = () => {
     rooms.reload()
@@ -49,7 +45,6 @@ export default function Rooms() {
   const allRooms = rooms.data ?? []
   const roomBranchOf = (room) => catalog.data?.roomBranchById.get(room.roomBranchId)
 
-  // Sede, tipo y busqueda definen el alcance; las tarjetas de resumen cuentan sobre el.
   const inScope = allRooms.filter((room) => {
     const roomBranch = roomBranchOf(room)
     if (filters.branchId && roomBranch?.branchId !== Number(filters.branchId)) return false
@@ -64,7 +59,6 @@ export default function Rooms() {
   const setFilter = (name) => (event) => setFilters((current) => ({ ...current, [name]: event.target.value }))
   const toggleStatus = (status) => setFilters((current) => ({ ...current, status: current.status === status ? '' : status }))
 
-  // Accion rapida del Operador: la habitacion ya se limpio y vuelve a estar disponible.
   const markAvailable = async (room) => {
     setReleasingId(room.id)
     try {

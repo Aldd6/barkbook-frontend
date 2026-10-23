@@ -3,8 +3,6 @@ import { CButton } from '@coreui/react'
 import useAuth from '../../auth/useAuth'
 import AuthLayout from '../../layout/AuthLayout'
 
-// Usuario de personal cuyo perfil aun no existe: el Administrador debe vincularlo
-// a un empleado (PATCH /employees/:id/assign-user).
 export default function PendingEmployeeLink() {
   const { user, logout } = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)

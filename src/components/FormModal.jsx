@@ -1,7 +1,6 @@
 import { CButton, CForm, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CSpinner } from '@coreui/react'
 import ApiErrorAlert from './ApiErrorAlert'
 
-// Modal con un formulario: onSubmit viene de useForm().handleSubmit(...).
 export default function FormModal({ visible, title, onClose, onSubmit, submitting, apiError, fields, submitLabel = 'Guardar', size, children }) {
   return (
     <CModal visible={visible} onClose={onClose} alignment="center" size={size} backdrop={submitting ? 'static' : true}>

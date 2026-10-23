@@ -8,13 +8,11 @@ const MOVEMENT_COLORS = {
   [MOVEMENT_TYPE.REEMBOLSO]: 'info',
 }
 
-// Un CARGO sin metodo de pago es un servicio cargado a la cuenta, pendiente de cobro en mostrador.
 const methodLabel = (movement) => {
   if (movement.methodPayment) return PAYMENT_METHOD_LABELS[movement.methodPayment]
   return movement.movementType === MOVEMENT_TYPE.CARGO ? 'Cargo a cuenta' : '—'
 }
 
-// Estado de cuenta de una reserva: movimientos (bill) y saldo pendiente (balance) de la API.
 export default function BillTable({ bill = [], balance }) {
   if (bill.length === 0) return <p className="text-body-secondary mb-0">La reserva no tiene movimientos.</p>
 

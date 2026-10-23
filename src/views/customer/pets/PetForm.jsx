@@ -54,7 +54,6 @@ const toPayload = (values) => ({
   isNeutered: values.isNeutered,
 })
 
-// /mascotas/nueva y /mascotas/:id/editar
 export default function PetFormPage() {
   const { id } = useParams()
   const pet = useApiQuery(useCallback(() => (id ? getPet(id) : Promise.resolve(null)), [id]))

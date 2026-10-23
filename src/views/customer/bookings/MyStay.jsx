@@ -36,7 +36,6 @@ const loadStayDetail = async (bookingId) => {
   return { checkIn, orders }
 }
 
-// Estancias activas (EN ESTANCIA) del cliente: servicios contratados (ordenes) y acceso a solicitar mas.
 export default function MyStay() {
   const { customer } = useAuth()
   const query = useApiQuery(useCallback(() => loadStays(customer.id), [customer.id]))
@@ -73,7 +72,6 @@ function ActiveStay({ booking, catalog, petName }) {
   const { branch, roomType } = describeRoomBranch(catalog, booking.branchRoomId)
   const admittedPets = detail.data?.checkIn?.pets.filter((checkInPet) => checkInPet.admitted) ?? []
   const orders = detail.data?.orders ?? []
-  // Lo contratado que aun no se completa no esta en el saldo: se carga cuando el cuidador lo realiza.
   const pendingAmount = orders
     .filter((order) => order.status === SERVICE_ORDER_STATUS.PENDIENTE)
     .reduce((sum, order) => sum + Number(order.amount), 0)

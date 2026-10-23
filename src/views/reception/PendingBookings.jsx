@@ -17,7 +17,6 @@ const loadPending = () =>
     customersById: new Map(customers.map((customer) => [customer.id, customer])),
   }))
 
-// Reservas PENDIENTE DE CONFIRMAR: tienen 5 dias para pagarse en mostrador o se cancelan solas.
 export default function PendingBookings() {
   const data = useApiQuery(loadPending)
   const catalog = useRoomCatalog()

@@ -3,7 +3,6 @@ import useAuth from './useAuth'
 import { AUTH_STATUS } from './AuthContext'
 import LoadingScreen from '../components/LoadingScreen'
 
-// Login y registro: si ya hay sesion, vuelve a donde iba el usuario o al inicio.
 export default function GuestOnly() {
   const { status } = useAuth()
   const location = useLocation()

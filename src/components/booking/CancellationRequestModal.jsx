@@ -17,7 +17,6 @@ const RULES = {
   ],
 }
 
-// POST /booking-cancellations. Renderizar con key para reiniciar el formulario.
 export default function CancellationRequestModal({ booking, visible, onClose, onRequested }) {
   const toast = useToast()
   const { values, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm({ reason: '' }, { rules: RULES })

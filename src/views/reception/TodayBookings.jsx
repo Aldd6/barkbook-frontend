@@ -12,7 +12,6 @@ import { BOOKING_STATUS, BOOKING_STATUS_OPTIONS } from '../../constants/enums'
 import { formatDate, todayISO } from '../../utils/format'
 import { customerName, isActiveOn, isArrivalDue, isDepartureDue, isUpcoming } from './frontDesk'
 
-// GET /bookings no filtra por fecha: se cargan todas y se filtran aqui.
 const loadFrontDesk = () =>
   Promise.all([getBookings(), getCustomers()]).then(([bookings, customers]) => ({
     bookings,
@@ -31,7 +30,6 @@ export default function TodayBookings() {
   const data = useApiQuery(loadFrontDesk)
   const catalog = useRoomCatalog()
   const [activeTab, setActiveTab] = useState('arrivals')
-  // Sin fecha por defecto: la busqueda debe encontrar tambien reservas futuras o pasadas.
   const [filters, setFilters] = useState({ day: '', status: '', search: '' })
   const [toPay, setToPay] = useState(null)
   const today = todayISO()

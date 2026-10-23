@@ -37,7 +37,6 @@ export default function BookingDetail() {
   const [orderToCancel, setOrderToCancel] = useState(null)
 
   const petName = (petId) => pets.data?.find((pet) => pet.id === petId)?.name ?? `Mascota #${petId}`
-  // La API devuelve las solicitudes de la mas reciente a la mas antigua.
   const latestCancellation = cancellations.data?.[0]
   const cancellable = [BOOKING_STATUS.CONFIRMADA, BOOKING_STATUS.PENDIENTE].includes(booking.data?.bookingStatus)
   const canRequestCancel =
@@ -131,7 +130,6 @@ export default function BookingDetail() {
   )
 }
 
-// Estado de la ultima solicitud de cancelacion mientras la reserva sigue vigente.
 function CancellationNotice({ cancellation }) {
   if (cancellation?.status === CANCELLATION_STATUS.PENDIENTE) {
     return (

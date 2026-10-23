@@ -38,7 +38,6 @@ import Services from './views/admin/Services'
 import ServiceBranches from './views/admin/ServiceBranches'
 import { PERMISSIONS, ROOM_OPERATION_PERMISSIONS } from './constants/permissions'
 
-// Cada ruta exige el mismo permiso que el endpoint principal que usa en el back end.
 export default function AppRoutes() {
   return (
     <Routes>
@@ -60,7 +59,6 @@ export default function AppRoutes() {
           <Route element={<DefaultLayout />}>
             <Route index element={<Home />} />
 
-            {/* Cliente: rutas filtradas por su customerId */}
             <Route element={<RequireCustomer />}>
               <Route path="/mascotas" element={<Pets />} />
               <Route path="/mascotas/:id" element={<PetDetail />} />
@@ -72,7 +70,6 @@ export default function AppRoutes() {
               <Route element={<RequirePermission permission={PERMISSIONS.CONSULTAR_CUENTA_RESERVACION} />}>
                 <Route path="/reservas" element={<Bookings />} />
                 <Route path="/reservas/:id" element={<BookingDetail />} />
-                {/* Mi estancia lista las reservas del cliente y el catalogo de servicios de cada una */}
                 <Route element={<RequirePermission permission={PERMISSIONS.CARGAR_SERVICIOS_RESERVACION} />}>
                   <Route path="/mi-estancia" element={<MyStay />} />
                 </Route>
@@ -86,7 +83,6 @@ export default function AppRoutes() {
               <Route path="/perfil" element={<Profile />} />
             </Route>
 
-            {/* Recepcion */}
             <Route element={<RequirePermission permission={PERMISSIONS.VER_RESERVAS_DIA} />}>
               <Route path="/recepcion/reservas" element={<TodayBookings />} />
               <Route path="/recepcion/pendientes" element={<PendingBookings />} />
@@ -101,22 +97,18 @@ export default function AppRoutes() {
               </Route>
             </Route>
 
-            {/* La API filtra las solicitudes por la sede del empleado */}
             <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_CANCELACIONES_RESERVACION} />}>
               <Route path="/recepcion/cancelaciones" element={<Cancellations />} />
             </Route>
 
-            {/* Cuidado: la API filtra las ordenes por la sede del empleado */}
             <Route element={<RequirePermission permission={PERMISSIONS.SUBIR_INFORMES_SERVICIOS} />}>
               <Route path="/cuidado/servicios" element={<PendingServices />} />
             </Route>
 
-            {/* Operacion: GET /room-inventory solo pide sesion; la pantalla sirve a quien cambia estados o gestiona habitaciones */}
             <Route element={<RequirePermission anyOf={ROOM_OPERATION_PERMISSIONS} />}>
               <Route path="/operacion/habitaciones" element={<Rooms />} />
             </Route>
 
-            {/* Administracion */}
             <Route element={<RequirePermission permission={PERMISSIONS.GESTIONAR_SEDES} />}>
               <Route path="/admin/sedes" element={<Branches />} />
             </Route>

@@ -14,6 +14,7 @@ Layout of `src/`:
 - `auth/` — `AuthProvider` keeps the access token in memory and `user/customer/employee/permissions` from `/auth/me`; route guards (`RequireAuth`, `RequireProfile`, `RequirePermission`, `GuestOnly`). Use `hasPermission()` for UI decisions; the Administrador passes every check, as in the back end.
 - `constants/` — exact API enums (`enums.js`, with `*_OPTIONS` for selects) and permission names (`permissions.js`).
 - `utils/` — form validators matching the back-end DTOs, and formatters (GTQ, dates).
+- `views/landing/`: public landing page, shown at `/` when there is no session (`RequireAuth`); its copy lives in `content.js` (sample text to replace).
 - `layout/` (CoreUI sidebar/header), `nav/_nav.js` (menu items declare their required permission), `components/`, `views/`, `routes.jsx`.
 
 ## Commands

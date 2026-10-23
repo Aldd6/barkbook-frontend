@@ -1,6 +1,5 @@
 import { maxLength, required } from '../../utils/validators'
 
-// Pago en mostrador (confirm-payment y payment del check-out): cualquier metodo menos tarjeta.
 export const COUNTER_PAYMENT_FIELDS = ['methodPayment', 'reference', 'description']
 
 export const counterPaymentRules = {
@@ -11,7 +10,6 @@ export const counterPaymentRules = {
 
 export const emptyCounterPayment = { methodPayment: '', reference: '', description: '' }
 
-// Los opcionales vacios no se envian.
 export const toCounterPayment = (values) => {
   const payment = { methodPayment: values.methodPayment }
   if (values.reference.trim()) payment.reference = values.reference.trim()

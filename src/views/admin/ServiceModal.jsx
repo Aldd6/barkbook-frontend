@@ -26,7 +26,6 @@ const toFormValues = (service) => ({
   rate: service?.rate === undefined ? '' : String(service.rate),
 })
 
-// speciesType '' en el formulario = null en la API (aplica a cualquier especie).
 const toPayload = (values, isNew) => {
   const payload = {
     name: values.name.trim(),
@@ -40,8 +39,6 @@ const toPayload = (values, isNew) => {
   return payload
 }
 
-// POST /services o PUT /services/:id. Renderizar con key para reiniciar el formulario.
-// `service`: undefined = cerrado, null = nuevo, objeto = editar.
 export default function ServiceModal({ service, onClose, onSaved }) {
   const toast = useToast()
   const isNew = service === null

@@ -26,13 +26,10 @@ const loadBookingContext = async (bookingId, customerId) => {
   return { booking, checkIn, pets }
 }
 
-// El cliente contrata servicios para su reserva EN ESTANCIA (seccion "Servicios" de API.md): se crea una
-// orden PENDIENTE y el cargo se registra en la cuenta cuando el cuidador de la sede la completa.
 export default function RequestService() {
   const { id } = useParams()
   const { state } = useLocation()
   const { customer } = useAuth()
-  // Vuelve a la pantalla desde la que se llego (Mi estancia o el detalle de la reserva).
   const backTo = state?.backTo ?? `/reservas/${id}`
   const context = useApiQuery(useCallback(() => loadBookingContext(id, customer.id), [id, customer.id]))
 
@@ -62,14 +59,12 @@ export default function RequestService() {
 function ServiceCatalog({ bookingId, checkIn, pets, backTo }) {
   const services = useApiQuery(useCallback(() => getServicesForBooking(bookingId), [bookingId]))
 
-  // Solo las mascotas admitidas en el check-in pueden recibir servicios.
   const admittedPets = (checkIn?.pets ?? [])
     .filter((checkInPet) => checkInPet.admitted)
     .map((checkInPet) => {
       const pet = pets.find((item) => item.id === checkInPet.petId)
       return { id: checkInPet.petId, name: pet?.name ?? `Mascota #${checkInPet.petId}`, species: pet?.species }
     })
-  // Todas las mascotas de una reserva son de la especie de su tipo de habitacion.
   const species = admittedPets.find((pet) => pet.species)?.species
 
   if (admittedPets.length === 0) {
@@ -90,7 +85,6 @@ function ServiceCatalog({ bookingId, checkIn, pets, backTo }) {
   )
 }
 
-// Agrupa el catalogo por tipo de servicio, en el orden de SERVICE_TYPE.
 const groupByType = (services) =>
   Object.keys(SERVICE_TYPE_LABELS)
     .map((type) => ({ type, services: services.filter((service) => service.serviceType === type) }))
@@ -116,7 +110,6 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
 
   const selectedService = services.find((service) => String(service.id) === values.serviceId)
   const perPet = selectedService && !selectedService.isMultiGuest
-  // Por mascota: una orden por cada una, cada una por la tarifa. Grupal: una sola orden.
   const orderCount = perPet ? values.petIds.length : 1
   const amount = selectedService ? selectedService.rate * orderCount : 0
 
@@ -127,14 +120,12 @@ function ServiceForm({ bookingId, services, admittedPets, backTo }) {
 
   const selectedPetNames = admittedPets.filter((pet) => values.petIds.includes(pet.id)).map((pet) => pet.name)
 
-  // Primero valida y pide confirmacion; la orden se crea al confirmar.
   const onSubmit = handleSubmit(async () => setConfirming(true))
 
   const onConfirm = handleSubmit(async (form) => {
     const payload = { serviceId: Number(form.serviceId) }
     if (perPet) payload.petIds = form.petIds
     if (form.description.trim()) payload.description = form.description.trim()
-    // Ante cualquier error se cierra el modal para que se vea el mensaje en el formulario.
     try {
       const result = await createServiceOrders(bookingId, payload)
       toast.success(result.message)

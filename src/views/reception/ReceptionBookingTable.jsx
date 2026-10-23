@@ -8,7 +8,6 @@ import { PERMISSIONS } from '../../constants/permissions'
 import { formatCurrency, formatDate, todayISO } from '../../utils/format'
 import { customerName, isArrivalDue } from './frontDesk'
 
-// Tabla de reservas para recepcion con las acciones que permite el estado y los permisos del usuario.
 export default function ReceptionBookingTable({ bookings, customersById, catalog, onPay, emptyText = 'No hay reservas.', renderExtraColumn }) {
   const { hasPermission } = useAuth()
   const today = todayISO()

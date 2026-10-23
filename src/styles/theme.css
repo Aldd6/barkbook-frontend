@@ -1,26 +1,49 @@
-/* Tema de Guau & Miau Club sobre CoreUI 5.
-   CoreUI usa variables CSS (--cui-*) para casi todo; los botones y el foco de los
-   inputs traen el color compilado, por eso se sobrescriben aparte. */
 
 :root,
 [data-coreui-theme='light'] {
-  /* Paleta de la marca */
+  color-scheme: light;
+
   --bb-orange: #cc5803;
   --bb-orange-dark: #a34603;
   --bb-amber: #ff9505;
   --bb-brown: #582b11;
   --bb-sand: #e7d7c9;
+  --bb-cream: #fdf6ee;
+  --bb-line: #f0e2d4;
+  --bb-text: #3f2516;
+
+  --bb-font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --bb-shadow: 0 0.5rem 1.5rem rgba(88, 43, 17, 0.08), 0 0.125rem 0.25rem rgba(88, 43, 17, 0.05);
+  --bb-shadow-lift: 0 0.85rem 2rem rgba(88, 43, 17, 0.14);
+  --bb-radius-card: 1.25rem;
+
+  --bb-paw-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cdefs%3E%3Cg id='p'%3E%3Cellipse cx='32' cy='42' rx='13' ry='11'/%3E%3Ccircle cx='15' cy='27' r='6'/%3E%3Ccircle cx='25' cy='16' r='6'/%3E%3Ccircle cx='39' cy='16' r='6'/%3E%3Ccircle cx='49' cy='27' r='6'/%3E%3C/g%3E%3C/defs%3E%3Cg fill='%23cc5803' fill-opacity='0.05'%3E%3Cuse href='%23p' transform='translate(18 20) rotate(-18 32 32) scale(0.55)'/%3E%3Cuse href='%23p' transform='translate(105 100) rotate(22 32 32) scale(0.45)'/%3E%3C/g%3E%3C/svg%3E");
+  --bb-paw-pattern-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cdefs%3E%3Cg id='p'%3E%3Cellipse cx='32' cy='42' rx='13' ry='11'/%3E%3Ccircle cx='15' cy='27' r='6'/%3E%3Ccircle cx='25' cy='16' r='6'/%3E%3Ccircle cx='39' cy='16' r='6'/%3E%3Ccircle cx='49' cy='27' r='6'/%3E%3C/g%3E%3C/defs%3E%3Cg fill='%23ffffff' fill-opacity='0.14'%3E%3Cuse href='%23p' transform='translate(18 20) rotate(-18 32 32) scale(0.55)'/%3E%3Cuse href='%23p' transform='translate(105 100) rotate(22 32 32) scale(0.45)'/%3E%3C/g%3E%3C/svg%3E");
+
+  --cui-body-font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --cui-body-color: var(--bb-text);
+  --cui-body-color-rgb: 63, 37, 22;
+  --cui-emphasis-color: #2b180d;
+  --cui-emphasis-color-rgb: 43, 24, 13;
+  --cui-secondary-color: rgba(63, 37, 22, 0.68);
+  --cui-border-color: #ead9c9;
+  --cui-border-color-translucent: rgba(88, 43, 17, 0.12);
+  --cui-tertiary-bg: #fbf1e7;
+  --cui-border-radius: 0.75rem;
+  --cui-border-radius-sm: 0.5rem;
+  --cui-border-radius-lg: 1rem;
+  --cui-border-radius-xl: 1.5rem;
 
   --cui-primary: var(--bb-orange);
   --cui-primary-rgb: 204, 88, 3;
   --cui-primary-text-emphasis: #7a3502;
-  --cui-primary-bg-subtle: #f5ded0;
+  --cui-primary-bg-subtle: #fbe4d3;
   --cui-primary-border-subtle: #ebbc9a;
 
   --cui-warning: var(--bb-amber);
   --cui-warning-rgb: 255, 149, 5;
   --cui-warning-text-emphasis: var(--bb-brown);
-  --cui-warning-bg-subtle: #ffead0;
+  --cui-warning-bg-subtle: #fff0d9;
   --cui-warning-border-subtle: #ffd59b;
 
   --cui-link-color: var(--bb-orange);
@@ -32,7 +55,63 @@
   --cui-heading-color: var(--bb-brown);
 }
 
-/* Botones */
+::selection {
+  background-color: rgba(255, 149, 5, 0.35);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.modal-title,
+.card-header,
+.page-title {
+  font-family: var(--bb-font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+dt {
+  font-weight: 700;
+}
+
+.btn {
+  border-radius: 50rem;
+  font-weight: 700;
+  padding-inline: 1.1rem;
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.1s;
+}
+
+.btn-sm {
+  padding-inline: 0.75rem;
+}
+
+.btn[class*='btn-']:not([class*='-outline-']):not([class*='-ghost-']):not(.btn-link) {
+  box-shadow: 0 3px 0 rgba(88, 43, 17, 0.22);
+}
+
+.btn:hover:not(:disabled):not(.disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled):not(.disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(88, 43, 17, 0.22) !important;
+}
+
 .btn-primary {
   --cui-btn-color: #fff;
   --cui-btn-bg: var(--bb-orange);
@@ -67,6 +146,15 @@
   --cui-btn-disabled-border-color: var(--bb-orange);
 }
 
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-danger,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-info {
+  border-width: 2px;
+}
+
 .btn-warning {
   --cui-btn-color: var(--bb-brown);
   --cui-btn-bg: var(--bb-amber);
@@ -83,40 +171,196 @@
   --cui-btn-disabled-border-color: var(--bb-amber);
 }
 
-/* Foco de inputs */
+.form-control,
+.form-select {
+  border-color: var(--cui-border-color);
+  background-color: #fffdfb;
+}
+
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
   border-color: #e6ac81;
-  box-shadow: 0 0 0 0.25rem rgba(204, 88, 3, 0.25);
+  box-shadow: 0 0 0 0.25rem rgba(204, 88, 3, 0.2);
 }
 
-/* Sidebar: cafe de la marca, encabezado claro para que el logo se lea bien */
+.form-label {
+  font-weight: 700;
+  color: var(--bb-brown);
+}
+
+.form-check-input:checked {
+  background-color: var(--bb-orange);
+  border-color: var(--bb-orange);
+}
+
+.card {
+  --cui-card-border-width: 0;
+  --cui-card-border-radius: var(--bb-radius-card);
+  --cui-card-cap-bg: transparent;
+  --cui-card-cap-padding-y: 0.9rem;
+  --cui-card-cap-padding-x: 1.25rem;
+  --cui-card-spacer-x: 1.25rem;
+  --cui-card-spacer-y: 1.1rem;
+  box-shadow: var(--bb-shadow);
+}
+
+.card-header {
+  border-bottom: 2px dashed var(--bb-line);
+  color: var(--bb-brown);
+  font-size: 1.05rem;
+}
+
+.card-header-tabs {
+  font-family: var(--cui-body-font-family);
+}
+
+.nav-underline-border .nav-link {
+  font-weight: 700;
+  color: var(--cui-secondary-color);
+}
+
+.nav-underline-border .nav-link.active,
+.nav-underline-border .nav-link:hover {
+  color: var(--bb-orange);
+  border-bottom-color: var(--bb-orange);
+}
+
+.table {
+  --cui-table-border-color: var(--bb-line);
+  --cui-table-hover-bg: rgba(255, 149, 5, 0.08);
+  --cui-table-color: var(--bb-text);
+  --cui-table-hover-color: var(--bb-text);
+}
+
+.table > thead th {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(88, 43, 17, 0.6);
+  border-bottom: 2px dashed var(--bb-line);
+  white-space: nowrap;
+}
+
+.card-body.p-0 .table > :not(caption) > * > :first-child {
+  padding-inline-start: 1.25rem;
+}
+
+.card-body.p-0 .table > :not(caption) > * > :last-child {
+  padding-inline-end: 1.25rem;
+}
+
+.badge {
+  border-radius: 50rem;
+  font-weight: 700;
+  padding: 0.4em 0.75em;
+  letter-spacing: 0.01em;
+}
+
+.alert {
+  border-width: 0 0 0 5px;
+  border-radius: 1rem;
+}
+
+.modal {
+  --cui-modal-border-radius: 1.5rem;
+  --cui-modal-border-width: 0;
+  --cui-modal-header-border-width: 0;
+  --cui-modal-footer-border-width: 0;
+  --cui-modal-box-shadow: var(--bb-shadow-lift);
+}
+
+.modal-header {
+  padding-bottom: 0.5rem;
+}
+
+.modal-title {
+  color: var(--bb-brown);
+}
+
+.modal-backdrop {
+  --cui-backdrop-bg: #2b180d;
+  --cui-backdrop-opacity: 0.45;
+}
+
+.dropdown-menu {
+  --cui-dropdown-border-width: 0;
+  --cui-dropdown-border-radius: 1rem;
+  --cui-dropdown-link-active-bg: var(--bb-orange);
+  --cui-dropdown-link-hover-bg: #fbf1e7;
+  box-shadow: var(--bb-shadow-lift);
+  overflow: hidden;
+}
+
+.list-group {
+  --cui-list-group-border-color: var(--bb-line);
+}
+
 .sidebar.app-sidebar {
-  --cui-sidebar-bg: var(--bb-brown);
-  --cui-sidebar-nav-link-active-bg: rgba(204, 88, 3, 0.35);
-  --cui-sidebar-nav-link-hover-bg: rgba(255, 149, 5, 0.15);
-  --cui-sidebar-nav-link-active-icon-color: var(--bb-amber);
+  --cui-sidebar-bg: linear-gradient(180deg, #6a3517 0%, var(--bb-brown) 55%, #44200b 100%);
+  --cui-sidebar-nav-link-border-radius: 50rem;
+  --cui-sidebar-nav-link-padding-y: 0.6rem;
+  --cui-sidebar-nav-link-color: rgba(253, 246, 238, 0.82);
+  --cui-sidebar-nav-link-icon-color: rgba(253, 246, 238, 0.6);
+  --cui-sidebar-nav-link-hover-color: #fff;
+  --cui-sidebar-nav-link-hover-bg: rgba(255, 149, 5, 0.16);
   --cui-sidebar-nav-link-hover-icon-color: var(--bb-amber);
-  --cui-sidebar-nav-title-color: rgba(231, 215, 201, 0.6);
+  --cui-sidebar-nav-link-active-color: #fff;
+  --cui-sidebar-nav-link-active-bg: var(--bb-orange);
+  --cui-sidebar-nav-link-active-icon-color: #fff;
+  --cui-sidebar-nav-title-color: rgba(255, 149, 5, 0.75);
+  border-inline-end: 0 !important;
+  box-shadow: 4px 0 1.5rem rgba(43, 24, 13, 0.12);
+}
+
+.app-sidebar .sidebar-nav {
+  padding-inline: 0.75rem;
+}
+
+.app-sidebar .sidebar-nav .nav-link {
+  margin-block: 2px;
+  font-weight: 600;
+}
+
+.app-sidebar .sidebar-nav .nav-link.active {
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.app-sidebar .sidebar-nav .nav-title {
+  font-family: var(--bb-font-display);
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .app-sidebar-brand {
   background-color: #fff;
   min-height: calc(4rem + 1px);
-  border-bottom: 1px solid rgba(88, 43, 17, 0.15);
+  border-bottom: 0;
+  border-bottom-right-radius: 1.5rem;
 }
 
 .app-sidebar-brand .btn-close {
   margin-inline-start: auto;
 }
 
-/* Layout (equivalente al scss del template de CoreUI) */
+.app-sidebar .sidebar-footer {
+  border-top-color: rgba(253, 246, 238, 0.12) !important;
+}
+
 .wrapper {
   width: 100%;
   padding-inline-start: var(--cui-sidebar-occupy-start, 0);
-  background-color: var(--bb-sand);
+  background-color: var(--bb-cream);
+  background-image: var(--bb-paw-pattern);
   transition: padding 0.15s;
+}
+
+.app-header {
+  --cui-header-bg: rgba(255, 255, 255, 0.82);
+  --cui-header-border-color: transparent;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 1rem rgba(88, 43, 17, 0.06);
 }
 
 .app-header > .container-fluid {
@@ -129,6 +373,8 @@
 
 .app-greeting {
   color: var(--bb-brown);
+  font-family: var(--bb-font-display);
+  font-weight: 500;
 }
 
 .app-avatar {
@@ -140,46 +386,120 @@
   border-radius: 50%;
   background-color: var(--bb-sand);
   color: var(--bb-brown);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bb-amber);
 }
 
 .app-footer {
-  color: var(--bb-brown);
+  --cui-footer-bg: transparent;
+  --cui-footer-border-color: transparent;
+  color: rgba(88, 43, 17, 0.7);
   font-size: 0.875rem;
 }
 
 .page-title {
+  display: inline;
   color: var(--bb-brown);
+  background-image: linear-gradient(transparent 62%, rgba(255, 149, 5, 0.32) 62%, rgba(255, 149, 5, 0.32) 92%, transparent 92%);
+  padding-inline: 0.15em;
+  margin-inline-start: -0.15em;
+}
+
+.page-title + p {
+  margin-top: 0.4rem;
 }
 
 .permission-badge {
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid var(--bb-sand);
+  background-color: #fffaf5 !important;
 }
 
-/* Pantallas de autenticacion */
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, var(--bb-orange) 0%, var(--bb-amber) 100%);
+  color: #fff;
+}
+
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--bb-paw-pattern-light);
+  pointer-events: none;
+}
+
+.home-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-hero h1 {
+  color: #fff;
+}
+
+.home-hero-logo {
+  width: 5.5rem;
+  height: 5.5rem;
+  padding: 0.6rem;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 0.5rem 1.25rem rgba(43, 24, 13, 0.2);
+  object-fit: contain;
+}
+
 .auth-layout {
-  background-color: var(--bb-sand);
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bb-cream);
+  background-image:
+    var(--bb-paw-pattern),
+    radial-gradient(circle at 10% 15%, rgba(255, 149, 5, 0.35) 0, transparent 30%),
+    radial-gradient(circle at 90% 85%, rgba(204, 88, 3, 0.28) 0, transparent 35%);
+}
+
+.auth-layout .card {
+  border-radius: 2rem;
+  box-shadow: var(--bb-shadow-lift);
 }
 
 .auth-logo {
   max-width: 180px;
   width: 100%;
   height: auto;
+  animation: bb-bounce-in 0.6s ease-out both;
 }
 
-/* Tarjetas seleccionables (habitaciones y servicios) */
+@keyframes bb-bounce-in {
+  0% {
+    transform: scale(0.85) translateY(8px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04) translateY(-2px);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}
+
 .room-option {
-  border: 1px solid var(--cui-border-color);
+  border: 2px solid var(--cui-border-color);
   background-color: var(--cui-body-bg);
   color: inherit;
   padding: 0;
+  box-shadow: none;
   transition:
     border-color 0.15s,
-    box-shadow 0.15s;
+    box-shadow 0.15s,
+    transform 0.15s;
 }
 
 .room-option:hover {
   border-color: #e6ac81;
+  transform: translateY(-2px);
+  box-shadow: var(--bb-shadow);
 }
 
 .room-option:focus-visible {
@@ -193,7 +513,6 @@
   background-color: #fff8f2;
 }
 
-/* Resumen fijo al hacer scroll en pantallas grandes */
 @media (min-width: 992px) {
   .booking-summary {
     position: sticky;
@@ -201,20 +520,23 @@
   }
 }
 
-/* Campo de tarjeta de Stripe con el aspecto de un input de CoreUI */
 .stripe-card-field {
   padding-top: 0.6rem;
   padding-bottom: 0.6rem;
 }
 
-/* Tablero de habitaciones fisicas: el color de cada tarjeta viene del estado (--room-color) */
 .room-summary {
   border: 1px solid var(--cui-border-color);
-  border-left: 4px solid var(--room-color);
-  border-radius: var(--cui-border-radius);
+  border-left: 5px solid var(--room-color);
+  border-radius: 1rem;
   background-color: var(--cui-body-bg);
   color: inherit;
   padding: 0.75rem 1rem;
+  transition: transform 0.15s;
+}
+
+.room-summary:hover {
+  transform: translateY(-2px);
 }
 
 .room-summary:focus-visible,
@@ -234,9 +556,10 @@
 
 .room-tile {
   border: 1px solid var(--cui-border-color);
-  border-top: 4px solid var(--room-color);
-  border-radius: var(--cui-border-radius);
+  border-top: 5px solid var(--room-color);
+  border-radius: 1rem;
   padding: 0.5rem;
+  background-color: var(--cui-body-bg);
 }
 
 .room-tile-main {
@@ -254,7 +577,6 @@
   opacity: 0.75;
 }
 
-/* Fotos y documentos (URLs firmadas de S3) */
 .app-avatar {
   flex-shrink: 0;
   overflow: hidden;
@@ -273,8 +595,8 @@
   width: 100%;
   max-width: 12rem;
   aspect-ratio: 1;
-  border: 1px dashed var(--cui-border-color);
-  border-radius: var(--cui-border-radius);
+  border: 2px dashed var(--cui-border-color);
+  border-radius: 1.25rem;
   background-color: var(--cui-tertiary-bg);
   overflow: hidden;
 }
@@ -288,4 +610,21 @@
 
 .profile-picture {
   max-width: 12rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .room-option,
+  .room-summary,
+  .auth-logo {
+    transition: none;
+    animation: none;
+  }
+
+  .btn:hover:not(:disabled):not(.disabled),
+  .btn:active:not(:disabled):not(.disabled),
+  .room-option:hover,
+  .room-summary:hover {
+    transform: none;
+  }
 }

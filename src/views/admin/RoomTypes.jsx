@@ -15,12 +15,10 @@ import { PET_SPECIES_LABELS } from '../../constants/enums'
 import { ROOM_AMENITIES } from '../../constants/roomTypes'
 import { formatCurrency } from '../../utils/format'
 
-// Catalogo de tipos de habitacion (P: Gestionar tipos de habitacion). Que tipos ofrece cada sede
-// y cuantas unidades se configura despues en las habitaciones por sede.
 export default function RoomTypes() {
   const toast = useToast()
   const roomTypes = useApiQuery(getRoomTypes)
-  const [editing, setEditing] = useState(undefined) // undefined = cerrado, null = nuevo
+  const [editing, setEditing] = useState(undefined)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)

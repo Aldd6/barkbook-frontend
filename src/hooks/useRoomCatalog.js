@@ -14,13 +14,10 @@ const loadCatalog = () =>
     roomBranchById: byId(roomBranches),
   }))
 
-// Sedes, tipos de habitacion y habitaciones por sede (GET con cualquier sesion).
-// Sirve para mostrar el nombre de sede y tipo de una reserva a partir de branchRoomId.
 export default function useRoomCatalog() {
   return useApiQuery(loadCatalog)
 }
 
-// { branch, roomType } de una reserva (branchRoomId -> RoomBranch -> sede y tipo).
 export const describeRoomBranch = (catalog, branchRoomId) => {
   const roomBranch = catalog?.roomBranchById.get(branchRoomId)
   return {

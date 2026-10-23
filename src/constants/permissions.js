@@ -1,5 +1,3 @@
-// Nombres exactos de los permisos (PERMISSIONS en app/shared/constants/enums.js del back end).
-// Se comparan contra GET /auth/me -> permissions.
 export const PERMISSIONS = Object.freeze({
   GESTIONAR_ROLES_PERMISOS: 'Gestionar roles y permisos',
   GESTIONAR_USUARIOS: 'Gestionar usuarios',
@@ -29,15 +27,11 @@ export const PERMISSIONS = Object.freeze({
   APLICAR_ALIMENTACION: 'Aplicar alimentacion a mascotas',
 })
 
-// Acceso al tablero de habitaciones fisicas (ruta y menu).
 export const ROOM_OPERATION_PERMISSIONS = Object.freeze([
   PERMISSIONS.ACTUALIZAR_ESTADO_HABITACIONES,
   PERMISSIONS.GESTIONAR_HABITACIONES_FISICAS,
 ])
 
-// Mismo criterio que authorize.js del back end: el Administrador pasa cualquier chequeo.
 export const ADMIN_ROLE_NAME = 'Administrador'
 
-// Solo para el flujo de perfil obligatorio: identifica quien debe completar el perfil de cliente.
-// No se usa para decidir permisos.
 export const CUSTOMER_ROLE_NAME = 'Cliente'

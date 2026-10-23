@@ -28,7 +28,6 @@ import { CANCELLATION_STATUS, MOVEMENT_TYPE } from '../../constants/enums'
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/format'
 import { customerName } from './frontDesk'
 
-// La API ya filtra por la sede del empleado (todas para el Administrador).
 const loadCancellations = () =>
   Promise.all([getBookingCancellations(), getCustomers()]).then(([cancellations, customers]) => ({
     cancellations,
@@ -43,13 +42,11 @@ const TABS = [
 const paidAmount = (booking) =>
   (booking?.bill ?? []).filter((movement) => movement.movementType === MOVEMENT_TYPE.ABONO).reduce((sum, movement) => sum + Number(movement.amount), 0)
 
-// Solicitudes de cancelacion de los clientes para la sede del recepcionista
-// (P: Gestionar cancelaciones de reservacion). Confirmar cancela la reserva y reembolsa los pagos.
 export default function Cancellations() {
   const data = useApiQuery(loadCancellations)
   const catalog = useRoomCatalog()
   const [activeTab, setActiveTab] = useState('pending')
-  const [action, setAction] = useState(null) // { cancellation, approve }
+  const [action, setAction] = useState(null)
 
   const all = data.data?.cancellations ?? []
   const byTab = {

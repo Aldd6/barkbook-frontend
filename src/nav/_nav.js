@@ -1,10 +1,6 @@
 import { cilBan, cilBasket, cilBed, cilBuilding, cilCalendar, cilCalendarCheck, cilContact, cilHome, cilLayers, cilPaw, cilPeople, cilRoom, cilSitemap, cilSpa, cilTask, cilUser, cilWallet } from '@coreui/icons'
 import { PERMISSIONS, ROOM_OPERATION_PERMISSIONS } from '../constants/permissions'
 
-// Menu lateral agrupado por secciones. Cada item se muestra solo si:
-// - el usuario tiene `permission` (o alguno de `anyOf`, o todos los de `allOf`), y
-// - si `requiresCustomer`, la sesion tiene perfil de cliente (las rutas filtradas usan customerId).
-// Sin condiciones, lo ve cualquier sesion.
 const navigation = [
   {
     items: [{ name: 'Inicio', to: '/', icon: cilHome, end: true }],

@@ -3,7 +3,6 @@ import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 import { describeRoomBranch } from '../../hooks/useRoomCatalog'
 import { formatCurrency, formatDate, nightsBetween } from '../../utils/format'
 
-// Datos de una reserva. `extraRows` permite agregar filas (p. ej. el cliente en recepcion).
 export default function BookingInfoCard({ booking, catalog, petName, extraRows = [] }) {
   const { branch, roomType } = describeRoomBranch(catalog, booking.branchRoomId)
   const rows = [

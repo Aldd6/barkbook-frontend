@@ -2,7 +2,6 @@ import { CBadge, CCard, CCardBody, CCardHeader, CListGroup, CListGroupItem } fro
 import StatusBadge from '../StatusBadge'
 import { formatDate } from '../../utils/format'
 
-// Check-in (habitacion, mascotas admitidas o no) y check-out de una reserva.
 export default function StayInfoCard({ checkIn, checkOut, petName }) {
   if (!checkIn) return null
 

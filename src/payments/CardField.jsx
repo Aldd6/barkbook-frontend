@@ -10,8 +10,6 @@ const CARD_OPTIONS = {
   },
 }
 
-// Campo de tarjeta de Stripe. Los datos de la tarjeta nunca pasan por nuestro back end:
-// Stripe devuelve un PaymentMethod id que se envia como stripePaymentMethodId.
 export default function CardField({ error }) {
   if (!isStripeConfigured) {
     return (

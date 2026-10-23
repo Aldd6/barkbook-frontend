@@ -33,16 +33,13 @@ import { getBranches } from '../../api/branches'
 import { toApiError } from '../../api/errors'
 import { ADMIN_ROLE_NAME } from '../../constants/permissions'
 
-// Personal del hotel (P: Gestionar empleados). Crear el usuario de acceso usa ademas
-// GET /roles, que solo responde al Administrador.
 export default function Employees() {
   const { user } = useAuth()
   const toast = useToast()
   const employees = useApiQuery(getEmployees)
   const branches = useApiQuery(getBranches)
   const [filters, setFilters] = useState({ branchId: '', search: '' })
-  // Se guarda el id para que el modal vea los datos recargados (p. ej. la foto nueva).
-  const [editingId, setEditingId] = useState(undefined) // undefined = cerrado, null = nuevo
+  const [editingId, setEditingId] = useState(undefined)
   const [userFor, setUserFor] = useState(null)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -101,7 +98,6 @@ export default function Employees() {
     }
   }
 
-  // Acciones de acceso desde el modal de edicion: se cierra ese modal y se abre el de la accion.
   const fromEditor = (open) => (employee) => {
     setEditingId(undefined)
     open(employee)

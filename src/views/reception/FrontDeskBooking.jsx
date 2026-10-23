@@ -28,15 +28,13 @@ export default function FrontDeskBooking() {
   const cancellations = useApiQuery(useCallback(() => getCancellationsByBooking(id), [id]))
   const serviceOrders = useApiQuery(useCallback(() => getServiceOrdersByBooking(id), [id]))
   const [toPay, setToPay] = useState(null)
-  const [orderAction, setOrderAction] = useState(null) // { order, complete }
+  const [orderAction, setOrderAction] = useState(null)
 
   const booking = file.data?.booking
-  // Con una solicitud de cancelacion pendiente el back end rechaza el check-in hasta resolverla.
   const pendingCancellation = cancellations.data?.find((item) => item.status === CANCELLATION_STATUS.PENDIENTE)
   const canCheckIn = booking && !pendingCancellation && isArrivalDue(booking, todayISO()) && hasPermission(PERMISSIONS.HACER_CHECK_IN)
   const canCheckOut = booking?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA && hasPermission(PERMISSIONS.HACER_CHECK_OUT)
   const inStay = booking?.bookingStatus === BOOKING_STATUS.EN_ESTANCIA
-  // Cancelar una orden: Recepcionista (Hacer check-out) o Cuidador de la sede; completarla: solo el Cuidador.
   const canCancelOrders = inStay && (hasPermission(PERMISSIONS.HACER_CHECK_OUT) || hasPermission(PERMISSIONS.SUBIR_INFORMES_SERVICIOS))
   const canCompleteOrders = inStay && hasPermission(PERMISSIONS.SUBIR_INFORMES_SERVICIOS)
   const onOrderResolved = () => {

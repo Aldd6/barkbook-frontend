@@ -10,10 +10,6 @@ import { integerBetween, required } from '../../utils/validators'
 
 const FIELDS = ['branchId', 'roomTypeId', 'maximumQuantity']
 
-// POST /room-branches (sede + tipo + cupo) o PUT /room-branches/:id (solo el cupo).
-// Renderizar con key para reiniciar el formulario.
-// `roomBranch`: undefined = cerrado, null = nueva, objeto = editar. `generatedCount(id)` cuenta
-// las habitaciones vigentes de una configuracion: el cupo no puede quedar por debajo.
 export default function RoomBranchModal({ roomBranch, catalog, defaultBranchId = '', generatedCount, onClose, onSaved }) {
   const toast = useToast()
   const isNew = roomBranch === null
@@ -44,7 +40,6 @@ export default function RoomBranchModal({ roomBranch, catalog, defaultBranchId =
     },
   )
 
-  // Una sede solo puede tener una configuracion por tipo: se ocultan los tipos que ya tiene.
   const takenTypeIds = new Set(
     (catalog?.roomBranches ?? []).filter((item) => item.branchId === Number(values.branchId)).map((item) => item.roomTypeId),
   )
@@ -86,7 +81,6 @@ export default function RoomBranchModal({ roomBranch, catalog, defaultBranchId =
             options={branchOptions}
             value={values.branchId}
             onChange={(event) => {
-              // El tipo elegido puede no estar disponible en la otra sede.
               setValue('branchId', event.target.value)
               setValue('roomTypeId', '')
             }}

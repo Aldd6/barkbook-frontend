@@ -3,8 +3,6 @@ import StatusBadge from '../StatusBadge'
 import { SERVICE_ORDER_STATUS } from '../../constants/enums'
 import { formatCurrency, formatDateTime } from '../../utils/format'
 
-// Ordenes de servicio de una reserva (GET /service-orders/booking/:bookingId).
-// onCancel / onComplete: si se pasan, las ordenes PENDIENTE muestran esa accion.
 export default function ServiceOrdersTable({ orders = [], onCancel, onComplete, emptyText = 'La reserva no tiene servicios contratados.' }) {
   if (orders.length === 0) return <p className="text-body-secondary mb-0">{emptyText}</p>
 

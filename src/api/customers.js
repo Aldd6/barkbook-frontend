@@ -1,8 +1,6 @@
 import client from './client'
 import { deleteFile, putFile } from './files'
 
-// POST /customers: crea el perfil del usuario del token.
-// Devuelve un accessToken nuevo (profileCompleted: true) que reemplaza al anterior.
 export const createCustomer = (data) =>
   client.post('/customers', data).then(({ data: body }) => ({
     customer: body.customer,
@@ -13,10 +11,8 @@ export const getCustomer = (id) => client.get(`/customers/${id}`).then((r) => r.
 
 export const updateCustomer = (id, data) => client.put(`/customers/${id}`, data).then((r) => r.data)
 
-// Listado global (bloqueado para Clientes).
 export const getCustomers = () => client.get('/customers').then((r) => r.data.customers)
 
-// Foto de perfil: devuelven el body completo ({ message, customer }) con la URL firmada nueva.
 export const updateCustomerProfilePicture = (id, file) => putFile(`/customers/${id}/profile-picture`, file)
 
 export const removeCustomerProfilePicture = (id) => deleteFile(`/customers/${id}/profile-picture`)

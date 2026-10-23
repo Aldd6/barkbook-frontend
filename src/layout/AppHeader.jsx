@@ -19,7 +19,6 @@ export default function AppHeader({ onToggleSidebar }) {
   const { user, customer, employee, logout } = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)
 
-  // El nombre viene del perfil (cliente o empleado); si aun no hay perfil, el username.
   const displayName = customer?.name ?? employee?.name ?? user.username
 
   const handleLogout = async () => {
@@ -29,7 +28,7 @@ export default function AppHeader({ onToggleSidebar }) {
 
   return (
     <CHeader position="sticky" className="mb-4 p-0 app-header">
-      <CContainer className="border-bottom px-4" fluid>
+      <CContainer className="px-4" fluid>
         <CHeaderToggler onClick={onToggleSidebar} style={{ marginInlineStart: '-14px' }} aria-label="Mostrar u ocultar menú">
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>

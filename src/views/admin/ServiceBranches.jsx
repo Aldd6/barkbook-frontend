@@ -20,14 +20,11 @@ const loadData = async () => {
   }
 }
 
-// Que servicios presta cada sede (P: Gestionar catalogo de servicios). Es el catalogo que ve el
-// cliente al solicitar servicios en una reserva de esa sede. Cada interruptor asigna o retira al momento.
 export default function ServiceBranches() {
   const toast = useToast()
   const query = useApiQuery(loadData)
   const [branchFilter, setBranchFilter] = useState('')
-  const [pending, setPending] = useState(() => new Set()) // claves `${branchId}-${serviceId}` en curso
-  // Resultado de cada cambio (asignacion creada o null si se retiro) mientras llega la recarga.
+  const [pending, setPending] = useState(() => new Set())
   const [overrides, setOverrides] = useState(() => new Map())
 
   const assignment = (branchId, serviceId) => {

@@ -7,7 +7,6 @@ import { ADMIN_ROLE_NAME } from '../constants/permissions'
 
 export default function AuthProvider({ children }) {
   const [status, setStatus] = useState(AUTH_STATUS.LOADING)
-  // { user, customer, employee, permissions } de GET /auth/me
   const [session, setSession] = useState(null)
 
   const clearSession = useCallback(() => {
@@ -23,7 +22,6 @@ export default function AuthProvider({ children }) {
     return data
   }, [])
 
-  // Al cargar la app: POST /auth/refresh (cookie) y luego GET /auth/me.
   useEffect(() => {
     let cancelled = false
     setSessionExpiredHandler(clearSession)
@@ -55,16 +53,10 @@ export default function AuthProvider({ children }) {
   )
 
   const logout = useCallback(async () => {
-    try {
-      await authApi.signout()
-    } catch {
-      // Aunque falle en el servidor, la sesion local se cierra igual.
-    } finally {
-      clearSession()
-    }
+    await authApi.signout().catch(() => {})
+    clearSession()
   }, [clearSession])
 
-  // POST /customers devuelve un access token nuevo (profileCompleted: true) que reemplaza al anterior.
   const completeProfile = useCallback(
     async (data) => {
       const { customer, accessToken } = await createCustomer(data)

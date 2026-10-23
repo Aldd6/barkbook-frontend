@@ -1,5 +1,3 @@
-// Validaciones de formato iguales a los DTOs del back end (seccion 7 de API.md).
-// Cada validador devuelve el mensaje de error o null si el valor es valido.
 
 export const PHONE_REGEX = /^\+502\d{8}$/
 export const DPI_REGEX = /^\d{13}$/
@@ -37,7 +35,6 @@ export const email = (value) => {
   return EMAIL_REGEX.test(text) ? null : 'El correo electronico no es valido.'
 }
 
-// Fecha YYYY-MM-DD que ademas exista en el calendario (rechaza 2026-02-30).
 export const isValidDate = (value) => {
   if (!DATE_REGEX.test(value)) return false
   const [year, month, day] = value.split('-').map(Number)
@@ -47,7 +44,6 @@ export const isValidDate = (value) => {
 
 export const date = (value) => (isEmpty(value) || isValidDate(String(value)) ? null : 'La fecha debe tener el formato YYYY-MM-DD.')
 
-// Fechas que no pueden ser futuras (nacimiento, inicio de enfermedad, colocacion de vacuna).
 export const notFuture = (message) => (value) => {
   if (isEmpty(value) || !isValidDate(String(value))) return null
   const now = new Date()
@@ -73,8 +69,6 @@ export const maxLength =(max, message) => (value) =>
 export const minLength = (min, message) => (value) =>
   isEmpty(value) || String(value).trim().length >= min ? null : message ?? `Debe tener al menos ${min} caracteres.`
 
-// Ejecuta { campo: [validadores] } sobre values y devuelve { campo: mensaje } solo con los errores.
-// Los validadores reciben (valor, values) para reglas que dependen de otros campos.
 export const validate = (values, rules) =>
   Object.entries(rules).reduce((errors, [field, validators]) => {
     for (const validator of validators) {

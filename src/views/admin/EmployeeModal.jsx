@@ -11,8 +11,6 @@ import { dpi, maxLength, minLength, phone, required } from '../../utils/validato
 
 const FIELDS = ['branchId', 'stateId', 'cityId', 'name', 'lastname', 'dpiNumber', 'phoneNumber', 'addressLineOne', 'addressLineTwo']
 
-// Al crear, municipio y DPI son obligatorios; al editar el DPI no se puede cambiar y el municipio
-// solo se envia si se elige uno nuevo.
 const buildRules = (isNew) => (values) => ({
   branchId: [required('Seleccione la sede.')],
   cityId: isNew || values.stateId ? [required('Seleccione un municipio.')] : [],
@@ -51,9 +49,6 @@ const toPayload = (values, isNew) => {
   return payload
 }
 
-// POST /employees o PUT /employees/:id. Renderizar con key para reiniciar el formulario.
-// `employee`: undefined = cerrado, null = nuevo, objeto = editar (incluye la foto y el acceso al sistema).
-// onGrantAccess / onChangePassword / onRevoke reciben el empleado; onGrantAccess es opcional.
 export default function EmployeeModal({ employee, branches, onClose, onSaved, onGrantAccess, onChangePassword, onRevoke }) {
   const toast = useToast()
   const isNew = employee === null

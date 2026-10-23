@@ -7,8 +7,6 @@ import { required } from '../../utils/validators'
 
 const FIELDS = ['password', 'confirmPassword']
 
-// Igual que el DTO del back end: sin recortar espacios (forman parte de la contrasena).
-// bcrypt solo toma en cuenta los primeros 72 bytes.
 const RULES = {
   password: [
     required('Ingrese la nueva contraseña.'),
@@ -18,7 +16,6 @@ const RULES = {
   confirmPassword: [required('Confirme la contraseña.'), (value, all) => (value !== all.password ? 'Las contraseñas no coinciden.' : null)],
 }
 
-// PATCH /employees/:id/password. Renderizar con key={employee?.id}.
 export default function EmployeePasswordModal({ employee, onClose }) {
   const toast = useToast()
   const { values, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm({ password: '', confirmPassword: '' }, { rules: RULES })

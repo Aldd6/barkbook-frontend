@@ -1,6 +1,5 @@
 import client from './client'
 
-// Expediente de la mascota: dietas, enfermedades y vacunas comparten el mismo patron de rutas.
 const recordApi = (base, pluralKey) => ({
   listByPet: (petId) => client.get(`${base}/pet/${petId}`).then((r) => r.data[pluralKey]),
   create: (data) => client.post(base, data).then((r) => r.data),

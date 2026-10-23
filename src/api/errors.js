@@ -1,6 +1,3 @@
-// Errores de la API normalizados segun la seccion 2 de API.md:
-// - Validacion (400): { message, details: [{ field, message }] }
-// - Negocio: { flag, message }
 
 export const ERROR_FLAGS = Object.freeze({
   INVALID_INPUT: 'INVALID_INPUT',
@@ -25,7 +22,6 @@ export class ApiError extends Error {
     this.status = status
     this.flag = flag
     this.details = details
-    // { 'pets.0.nonadmissionReason': 'mensaje' } -> se busca por la ruta del campo.
     this.fieldErrors = details.reduce((acc, { field, message: fieldMessage }) => {
       if (field && !acc[field]) acc[field] = fieldMessage
       return acc
@@ -37,7 +33,6 @@ export class ApiError extends Error {
   }
 }
 
-// Convierte cualquier error (axios, red, codigo) en ApiError.
 export const toApiError = (error) => {
   if (error instanceof ApiError) return error
 
@@ -55,5 +50,4 @@ export const toApiError = (error) => {
   })
 }
 
-// Mensaje de un campo, aceptando la ruta con notacion de punto (pets.0.campo).
 export const getFieldError = (error, field) => error?.fieldErrors?.[field]

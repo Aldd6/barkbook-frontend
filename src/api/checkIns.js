@@ -1,7 +1,6 @@
 import client from './client'
 import { ERROR_FLAGS } from './errors'
 
-// null si la reserva todavia no tiene check-in (la API responde 404).
 export const getCheckInByBooking = (bookingId) =>
   client
     .get(`/check-ins/booking/${bookingId}`)
@@ -11,9 +10,9 @@ export const getCheckInByBooking = (bookingId) =>
       throw error
     })
 
-// Habitaciones fisicas disponibles del tipo y sede de la reserva.
 export const getAvailableRoomsForBooking = (bookingId) =>
   client.get(`/check-ins/booking/${bookingId}/available-rooms`).then((r) => r.data.roomInventory)
 
-// { bookingId, pets: [{ bookingPetId, admitted, nonadmissionReason? }], customerAcceptsPartialAdmission?, roomNumber?, observations? }
+export const getBookingPetsForCheckIn = (bookingId) => client.get(`/check-ins/booking/${bookingId}/pets`).then((r) => r.data.pets)
+
 export const createCheckIn = (data) => client.post('/check-ins', data).then((r) => r.data)

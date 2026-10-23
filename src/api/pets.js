@@ -1,7 +1,6 @@
 import client from './client'
 import { deleteFile, putFile } from './files'
 
-// Consultas: devuelven el recurso. Mutaciones: devuelven el body completo ({ message, pet }).
 
 export const getPetsByCustomer = (customerId) => client.get(`/pets/customer/${customerId}`).then((r) => r.data.pets)
 
@@ -13,7 +12,6 @@ export const updatePet = (id, data) => client.put(`/pets/${id}`, data).then((r) 
 
 export const deletePet = (id) => client.delete(`/pets/${id}`).then((r) => r.data)
 
-// Foto (jpeg, png, webp) y carne de vacunacion (ademas pdf). Devuelven { message, pet }.
 export const updatePetProfilePicture = (id, file) => putFile(`/pets/${id}/profile-picture`, file)
 
 export const removePetProfilePicture = (id) => deleteFile(`/pets/${id}/profile-picture`)

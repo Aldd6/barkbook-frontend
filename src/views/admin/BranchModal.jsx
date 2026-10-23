@@ -9,7 +9,6 @@ import { maxLength, minLength, required } from '../../utils/validators'
 
 const FIELDS = ['stateId', 'cityId', 'branchName', 'addressLineOne', 'addressLineTwo']
 
-// Al crear, el municipio es obligatorio; al editar solo se envia si se elige uno nuevo.
 const buildRules = (isNew) => (values) => ({
   cityId: isNew || values.stateId ? [required('Seleccione un municipio.')] : [],
   branchName: [
@@ -44,8 +43,6 @@ const toPayload = (values, isNew) => {
   return payload
 }
 
-// POST /branches o PUT /branches/:id. Renderizar con key para reiniciar el formulario.
-// `branch`: undefined = cerrado, null = nueva, objeto = editar.
 export default function BranchModal({ branch, onClose, onSaved }) {
   const toast = useToast()
   const isNew = branch === null

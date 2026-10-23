@@ -2,10 +2,6 @@ import { useState } from 'react'
 import { toApiError } from '../api/errors'
 import { validate } from '../utils/validators'
 
-// Estado de un formulario con validacion local y errores de la API.
-// - rules: { campo: [validadores] } o una funcion (values) => rules para reglas condicionales.
-// - fieldMap: traduce el campo que reporta la API (details[].field) al campo del formulario.
-// Los errores de un campo se limpian cuando el usuario lo edita.
 export default function useForm(initialValues, { rules = {}, fieldMap = {} } = {}) {
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState({})
@@ -14,7 +10,6 @@ export default function useForm(initialValues, { rules = {}, fieldMap = {} } = {
 
   const setValue = (name, value) => {
     setValues((current) => ({ ...current, [name]: value }))
-    // Limpia el error del campo y los anidados (editar `pets` limpia `pets.0.nonadmissionReason`).
     setErrors((current) => {
       const keys = Object.keys(current).filter((key) => current[key] && (key === name || key.startsWith(`${name}.`)))
       if (keys.length === 0) return current
@@ -53,7 +48,6 @@ export default function useForm(initialValues, { rules = {}, fieldMap = {} } = {
     }
   }
 
-  // Carga otros valores (p. ej. el registro a editar) y limpia los errores.
   const reset = (nextValues = initialValues) => {
     setValues(nextValues)
     setErrors({})

@@ -9,9 +9,6 @@ import { IMAGE_TYPES, MAX_FILE_SIZE, isPdfUrl } from '../api/files'
 
 const formatsLabel = (types) => types.map((type) => type.split('/')[1]).join(', ')
 
-// Vista previa y botones para subir, reemplazar o quitar un archivo (foto o documento).
-// `url` es la URL firmada que manda la API (o null). `onUpload(file)` y `onRemove()` llaman
-// a la API y devuelven el body ({ message, ... }); `onChanged(body)` actualiza la pantalla.
 export default function FileUpload({
   url,
   types = IMAGE_TYPES,
@@ -24,7 +21,7 @@ export default function FileUpload({
 }) {
   const toast = useToast()
   const inputRef = useRef(null)
-  const [busy, setBusy] = useState(null) // 'upload' | 'remove'
+  const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   const [failedUrl, setFailedUrl] = useState(null)
 
@@ -44,10 +41,9 @@ export default function FileUpload({
 
   const handleFile = (event) => {
     const file = event.target.files?.[0]
-    event.target.value = '' // permite volver a elegir el mismo archivo
+    event.target.value = ''
     if (!file) return
 
-    // Validacion previa; la API vuelve a validar el tipo por el contenido real del archivo.
     if (!types.includes(file.type)) {
       setError(new ApiError({ message: `Tipo de archivo no permitido. Formatos aceptados: ${formatsLabel(types)}.` }))
       return

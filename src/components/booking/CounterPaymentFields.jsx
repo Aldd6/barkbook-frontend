@@ -3,7 +3,6 @@ import EnumSelect from '../EnumSelect'
 import FormField from '../FormField'
 import { COUNTER_PAYMENT_METHOD_OPTIONS } from '../../constants/enums'
 
-// Campos de pago en mostrador (metodo, referencia, descripcion). Reglas y payload en counterPayment.js.
 export default function CounterPaymentFields({ values, handleChange, fieldError }) {
   return (
     <CRow>

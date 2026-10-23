@@ -1,6 +1,6 @@
 import { CBadge, CCard, CCardBody, CCardHeader, CCol, CRow } from '@coreui/react'
 import useAuth from '../../auth/useAuth'
-import PageHeader from '../../components/PageHeader'
+import logoIcon from '../../assets/brand/logo-icon.png'
 import { ADMIN_ROLE_NAME } from '../../constants/permissions'
 
 export default function Home() {
@@ -9,7 +9,15 @@ export default function Home() {
 
   return (
     <>
-      <PageHeader title={`Bienvenido, ${name}`} subtitle="Use el menú lateral para navegar por las opciones disponibles para su cuenta." />
+      <CCard className="home-hero mb-4">
+        <CCardBody className="d-flex flex-wrap align-items-center gap-4 p-4">
+          <img src={logoIcon} alt="" className="home-hero-logo" />
+          <div>
+            <h1 className="h2 mb-1">¡Bienvenido, {name}!</h1>
+            <p className="mb-0 opacity-75">Use el menú lateral para navegar por las opciones disponibles para su cuenta.</p>
+          </div>
+        </CCardBody>
+      </CCard>
       <CRow className="g-4">
         <CCol md={5}>
           <CCard className="h-100">

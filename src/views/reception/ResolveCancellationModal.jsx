@@ -19,15 +19,12 @@ const rulesFor = (approving) => ({
       ],
 })
 
-// PATCH /booking-cancellations/:id/approve o /reject.
-// `action`: { cancellation, approve: boolean } o null (cerrado). Renderizar con key para reiniciar.
 export default function ResolveCancellationModal({ action, onClose, onResolved }) {
   const toast = useToast()
   const approving = action?.approve ?? false
   const cancellation = action?.cancellation
   const { values, handleChange, handleSubmit, submitting, apiError, fieldError } = useForm({ resolutionNotes: '' }, { rules: rulesFor(approving) })
 
-  // Pagos que se reembolsan al aprobar, por metodo: la tarjeta va a Stripe y el resto se devuelve en mostrador.
   const payments = (cancellation?.booking?.bill ?? []).filter((movement) => movement.movementType === MOVEMENT_TYPE.ABONO)
   const cardTotal = payments.filter((m) => m.methodPayment === PAYMENT_METHOD.TARJETA).reduce((sum, m) => sum + Number(m.amount), 0)
   const counterPayments = payments.filter((m) => m.methodPayment !== PAYMENT_METHOD.TARJETA)

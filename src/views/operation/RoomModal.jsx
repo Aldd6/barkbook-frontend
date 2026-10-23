@@ -12,9 +12,6 @@ import { MANUAL_ROOM_STATUS_OPTIONS } from './roomInventory'
 
 const FIELDS = ['status', 'active']
 
-// Detalle de una habitacion fisica: cambiar estado y habilitarla (PUT /room-inventory/:id)
-// o archivarla (DELETE, lo confirma el padre con onArchive).
-// Renderizar con key={room?.id} para que el formulario se reinicie con cada habitacion.
 export default function RoomModal({ room, catalog, canUpdate, canArchive, onClose, onSaved, onArchive }) {
   const toast = useToast()
   const { values, handleChange, setValue, handleSubmit, submitting, apiError, fieldError } = useForm(

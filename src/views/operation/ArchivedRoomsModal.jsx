@@ -22,8 +22,6 @@ import { restoreRoomInventory } from '../../api/rooms'
 import { toApiError } from '../../api/errors'
 import { formatDateTime } from '../../utils/format'
 
-// Habitaciones archivadas (GET /room-inventory/archived) con la opcion de restaurarlas.
-// El padre carga el listado (`archived` es un useApiQuery) porque tambien lo usa al generar.
 export default function ArchivedRoomsModal({ visible, archived, catalog, onClose, onRestored }) {
   const toast = useToast()
   const [restoringId, setRestoringId] = useState(null)
@@ -37,7 +35,6 @@ export default function ArchivedRoomsModal({ visible, archived, catalog, onClose
       toast.success(result.message)
       onRestored?.(result.roomInventory)
     } catch (restoreError) {
-      // P. ej. 409 si la configuracion ya llego a su maximumQuantity.
       setError(toApiError(restoreError))
     } finally {
       setRestoringId(null)

@@ -1,5 +1,3 @@
-// Enums de la API (seccion 7 de API.md). Los valores son exactos: se envian tal cual.
-// *_LABELS solo sirven para mostrar texto mas legible en la UI.
 
 const toOptions = (values, labels = {}) => Object.values(values).map((value) => ({ value, label: labels[value] ?? value }))
 
@@ -110,7 +108,6 @@ export const PAYMENT_METHOD_LABELS = Object.freeze({
   TRANSFERENCIA: 'Transferencia',
 })
 
-// Orden de servicio: el cliente la contrata (PENDIENTE) y el cuidador de la sede la completa o se cancela.
 export const SERVICE_ORDER_STATUS = Object.freeze({ PENDIENTE: 'PENDIENTE', COMPLETADO: 'COMPLETADO', CANCELADO: 'CANCELADO' })
 export const SERVICE_ORDER_STATUS_LABELS = Object.freeze({ PENDIENTE: 'Pendiente', COMPLETADO: 'Completado', CANCELADO: 'Cancelado' })
 
@@ -120,7 +117,6 @@ export const MOVEMENT_TYPE_LABELS = Object.freeze({ CARGO: 'Cargo', ABONO: 'Abon
 export const CHECK_IN_STATUS = Object.freeze({ COMPLETADO: 'COMPLETADO', CANCELADO: 'CANCELADO' })
 export const CHECK_IN_STATUS_LABELS = Object.freeze({ COMPLETADO: 'Completado', CANCELADO: 'Cancelado' })
 
-// Solicitud de cancelacion: el cliente la crea y recepcion de la sede la aprueba o rechaza.
 export const CANCELLATION_STATUS = Object.freeze({ PENDIENTE: 'PENDIENTE', APROBADA: 'APROBADA', RECHAZADA: 'RECHAZADA' })
 export const CANCELLATION_STATUS_LABELS = Object.freeze({ PENDIENTE: 'Pendiente', APROBADA: 'Aprobada', RECHAZADA: 'Rechazada' })
 
@@ -130,7 +126,6 @@ export const SERVICE_TYPE_LABELS = Object.freeze({ ASEO: 'Aseo', RECREACION: 'Re
 export const TYPE_TRANSACTION = Object.freeze({ WRITE: 'WRT', READ: 'READ', UPDATE: 'UPD', ERASE: 'ERS' })
 export const TYPE_TRANSACTION_LABELS = Object.freeze({ WRT: 'Escritura', READ: 'Lectura', UPD: 'Actualización', ERS: 'Eliminación' })
 
-// Opciones { value, label } para selects.
 export const PET_SPECIES_OPTIONS = toOptions(PET_SPECIES, PET_SPECIES_LABELS)
 export const SEX_OPTIONS = toOptions(SEX, SEX_LABELS)
 export const PET_SIZE_OPTIONS = toOptions(PET_SIZE, PET_SIZE_LABELS)
@@ -142,7 +137,6 @@ export const KINSHIP_OPTIONS = toOptions(KINSHIP, KINSHIP_LABELS)
 export const ROOM_STATUS_OPTIONS = toOptions(ROOM_STATUS, ROOM_STATUS_LABELS)
 export const BOOKING_STATUS_OPTIONS = toOptions(BOOKING_STATUS, BOOKING_STATUS_LABELS)
 export const PAYMENT_METHOD_OPTIONS = toOptions(PAYMENT_METHOD, PAYMENT_METHOD_LABELS)
-// Pagos en mostrador (confirm-payment y check-out) aceptan cualquier metodo menos tarjeta.
 export const COUNTER_PAYMENT_METHOD_OPTIONS = PAYMENT_METHOD_OPTIONS.filter((o) => o.value !== PAYMENT_METHOD.TARJETA)
 export const MOVEMENT_TYPE_OPTIONS = toOptions(MOVEMENT_TYPE, MOVEMENT_TYPE_LABELS)
 export const CHECK_IN_STATUS_OPTIONS = toOptions(CHECK_IN_STATUS, CHECK_IN_STATUS_LABELS)

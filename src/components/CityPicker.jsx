@@ -4,8 +4,6 @@ import { getCities, getStates } from '../api/address'
 import { toApiError } from '../api/errors'
 import ApiErrorAlert from './ApiErrorAlert'
 
-// Departamento -> municipio con los catalogos publicos de /address.
-// Controlado: stateId/cityId son strings ('' = sin seleccionar).
 export default function CityPicker({ stateId, cityId, onStateChange, onCityChange, stateError, cityError, statePlaceholder = 'Seleccione un departamento' }) {
   const [states, setStates] = useState([])
   const [cities, setCities] = useState([])

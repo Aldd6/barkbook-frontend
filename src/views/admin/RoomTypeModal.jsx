@@ -25,7 +25,6 @@ const FIELDS = [
 
 const PREFIX_REGEX = /^[A-Za-z0-9]{2,10}$/
 
-// Las dimensiones son DECIMAL(5, 2) en la base de datos.
 const dimension = (label) => [
   required(`Ingrese el ${label}.`),
   positiveNumber(`El ${label} debe ser mayor a 0.`),
@@ -83,8 +82,6 @@ const toPayload = (values, isNew) => {
   return payload
 }
 
-// POST /room-types o PUT /room-types/:id. Renderizar con key para reiniciar el formulario.
-// `roomType`: undefined = cerrado, null = nuevo, objeto = editar.
 export default function RoomTypeModal({ roomType, onClose, onSaved }) {
   const toast = useToast()
   const isNew = roomType === null

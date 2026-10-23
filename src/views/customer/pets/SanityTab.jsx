@@ -43,7 +43,6 @@ const toFormValues = (record) => ({
   enduredUntil: record?.enduredUntil ?? '',
 })
 
-// Al editar, dejar vacia la fecha de fin envia null: el back end reactiva la enfermedad.
 const toPayload = (values, { editing }) => {
   const payload = {
     illnessName: values.illnessName.trim(),

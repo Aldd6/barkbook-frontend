@@ -21,12 +21,10 @@ const loadCatalog = async () => {
   return { services: [...services].sort((a, b) => a.name.localeCompare(b.name)), branchCount }
 }
 
-// Catalogo general de servicios (P: Gestionar catalogo de servicios). En que sedes se presta
-// cada uno se configura despues en Servicios por sede.
 export default function Services() {
   const toast = useToast()
   const catalog = useApiQuery(loadCatalog)
-  const [editing, setEditing] = useState(undefined) // undefined = cerrado, null = nuevo
+  const [editing, setEditing] = useState(undefined)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)

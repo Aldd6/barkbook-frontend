@@ -36,7 +36,6 @@ const toFormValues = (diet) => ({
   activeDiet: true,
 })
 
-// activeDiet solo se envia al crear; despues se cambia con activar/desactivar.
 const toPayload = (values, { editing }) => {
   const payload = {
     dietType: values.dietType,

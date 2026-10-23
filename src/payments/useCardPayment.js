@@ -4,8 +4,6 @@ import { isStripeConfigured } from './stripe'
 
 const paymentError = (message) => new ApiError({ status: 402, flag: ERROR_FLAGS.PAYMENT_FAILED, message })
 
-// Debe usarse dentro de <StripeProvider>. createPaymentMethodId() tokeniza la tarjeta del
-// CardField con Stripe y devuelve el id (pm_...) que espera el back end.
 export default function useCardPayment() {
   const stripe = useStripe()
   const elements = useElements()

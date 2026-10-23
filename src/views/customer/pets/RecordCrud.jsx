@@ -11,8 +11,6 @@ import ConfirmModal from '../../../components/ConfirmModal'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
 import { toApiError } from '../../../api/errors'
 
-// Lista + alta/edicion en modal + archivado para un recurso del expediente de la mascota
-// (dietas, enfermedades, vacunas). Cada recurso aporta sus columnas, formulario y conversiones.
 export default function RecordCrud({
   petId,
   api,
@@ -67,7 +65,6 @@ export default function RecordCrud({
     }
   }
 
-  // Acciones extra (p. ej. activar dieta): ejecutan la llamada y recargan la lista.
   const runAction = async (action) => {
     try {
       const { message } = await action()

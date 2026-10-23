@@ -3,10 +3,8 @@ import { toApiError } from './errors'
 
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
 
-// Rutas de auth que nunca deben disparar el refresh (evita ciclos).
 const NO_REFRESH_PATHS = ['/auth/signin', '/auth/signup', '/auth/refresh', '/auth/signout']
 
-// El access token vive solo en memoria (nunca en localStorage).
 let accessToken = null
 let sessionExpiredHandler = null
 let refreshPromise = null
@@ -16,7 +14,6 @@ export const setAccessToken = (token) => {
   accessToken = token
 }
 
-// El AuthProvider registra aqui como limpiar la sesion cuando el refresh falla.
 export const setSessionExpiredHandler = (handler) => {
   sessionExpiredHandler = handler
 }
@@ -27,8 +24,6 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// POST /auth/refresh deduplicado: las peticiones concurrentes comparten la misma promesa.
-// Se usa axios directo (sin interceptores) para que un 401 del refresh no intente refrescar otra vez.
 export const refreshAccessToken = () => {
   if (!refreshPromise) {
     refreshPromise = axios

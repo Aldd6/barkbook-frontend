@@ -9,8 +9,6 @@ import { email, required, username } from '../../utils/validators'
 
 const FIELDS = ['username', 'email', 'password', 'confirmPassword']
 
-// POST /auth/signup crea un usuario Cliente sin perfil. Luego se inicia sesion con las
-// mismas credenciales y RequireProfile lo lleva a completar el perfil.
 export default function Register() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -35,7 +33,6 @@ export default function Register() {
     try {
       await login({ username: account.username, password: account.password })
     } catch {
-      // La cuenta ya existe: si el inicio automatico falla, se pide iniciar sesion manualmente.
       navigate('/login', { replace: true, state: { message: 'Cuenta creada exitosamente. Inicie sesión para continuar.' } })
     }
   })

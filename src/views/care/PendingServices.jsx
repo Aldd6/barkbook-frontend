@@ -30,13 +30,11 @@ const TABS = [
   { key: 'resolved', label: 'Historial' },
 ]
 
-// Cola del Cuidador (P: Subir informes de servicios completados): ordenes contratadas por los clientes
-// en reservas EN ESTANCIA de su sede. Completar registra el cargo en la cuenta de la reserva.
 export default function PendingServices() {
   const pending = useApiQuery(useCallback(() => getServiceOrders(SERVICE_ORDER_STATUS.PENDIENTE), []))
   const catalog = useRoomCatalog()
   const [activeTab, setActiveTab] = useState('pending')
-  const [action, setAction] = useState(null) // { order, complete }
+  const [action, setAction] = useState(null)
   const [historyVersion, setHistoryVersion] = useState(0)
 
   const branchName = (branchId) => catalog.data?.branchById.get(branchId)?.branchName
@@ -92,7 +90,6 @@ export default function PendingServices() {
   )
 }
 
-// Ordenes completadas o canceladas, de la resolucion mas reciente a la mas antigua.
 function History({ branchName }) {
   const all = useApiQuery(useCallback(() => getServiceOrders(), []))
   const resolved = (all.data ?? [])
@@ -106,7 +103,6 @@ function History({ branchName }) {
   )
 }
 
-// onAction: solo en la pestana de pendientes (Completar / Cancelar).
 function OrdersTable({ orders = [], branchName, emptyText, onAction }) {
   if (orders.length === 0) return <p className="text-center text-body-secondary py-4 mb-0">{emptyText}</p>
 

@@ -34,22 +34,19 @@ import { PET_SPECIES_LABELS } from '../../constants/enums'
 import { PERMISSIONS } from '../../constants/permissions'
 import { formatCurrency } from '../../utils/format'
 
-// Que tipos de habitacion ofrece cada sede y cuantas unidades (P: Gestionar habitaciones por sede).
-// Es lo que reserva el cliente (branchRoomId) y el cupo de la generacion de habitaciones fisicas.
 export default function RoomBranches() {
   const { hasPermission } = useAuth()
   const toast = useToast()
   const catalog = useRoomCatalog()
   const rooms = useApiQuery(getRoomInventory)
   const [branchFilter, setBranchFilter] = useState('')
-  const [editing, setEditing] = useState(undefined) // undefined = cerrado, null = nueva
+  const [editing, setEditing] = useState(undefined)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
 
   const canGenerate = hasPermission(PERMISSIONS.GESTIONAR_HABITACIONES_FISICAS)
 
-  // Habitaciones vigentes por configuracion (GET /room-inventory no trae las archivadas).
   const countByRoomBranch = (rooms.data ?? []).reduce((acc, room) => acc.set(room.roomBranchId, (acc.get(room.roomBranchId) ?? 0) + 1), new Map())
   const generatedCount = (roomBranchId) => countByRoomBranch.get(roomBranchId) ?? 0
 

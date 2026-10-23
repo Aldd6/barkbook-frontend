@@ -28,8 +28,6 @@ const buildRules = (mode) =>
       }
     : { userId: [required('Seleccione un usuario.')] }
 
-// Roles del personal (GET /roles) y usuarios de personal aun sin empleado (GET /users).
-// Un usuario vinculado queda con profileCompleted: true, asi que los pendientes son los de personal sin perfil.
 const loadOptions = async () => {
   const [roles, users] = await Promise.all([getRoles(), getUsers()])
   const staffRoles = roles.filter((role) => role.name !== CUSTOMER_ROLE_NAME)
@@ -41,9 +39,6 @@ const loadOptions = async () => {
   }
 }
 
-// Da acceso al sistema a un empleado: crea el usuario (POST /users) y lo vincula
-// (PATCH /employees/:id/assign-user), o vincula un usuario de personal que ya exista.
-// Renderizar con key={employee?.id}.
 export default function EmployeeUserModal({ employee, onClose, onSaved }) {
   const toast = useToast()
   const options = useApiQuery(useCallback(() => (employee ? loadOptions() : Promise.resolve(null)), [employee]))
@@ -72,7 +67,6 @@ export default function EmployeeUserModal({ employee, onClose, onSaved }) {
         const result = await assignEmployeeUser(employee.id, userId)
         toast.success(result.message)
       } catch (error) {
-        // El usuario ya existe: se puede reintentar desde "Vincular usuario existente".
         options.reload()
         setMode(MODE.EXISTING)
         reset({ ...form, userId: String(userId) })

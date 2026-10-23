@@ -10,13 +10,9 @@ import { lastConsecutive, roomNumberFor } from './roomInventory'
 const FIELDS = ['branchId', 'roomTypeId', 'quantity']
 const MAX_PER_REQUEST = 500
 
-// POST /room-inventory/generate: crea en lote las habitaciones de un tipo en una sede,
-// hasta el maximumQuantity de su RoomBranch. El back end numera con el prefijo del tipo.
-// `archivedRooms` solo sirve para anticipar los numeros: no ocupan cupo pero si numero.
 export default function GenerateRoomsModal({ visible, catalog, rooms, archivedRooms = [], onClose, onGenerated }) {
   const toast = useToast()
 
-  // Cupo de la configuracion elegida; igual que el back end, solo cuentan las vigentes.
   const capacityFor = (values) => {
     const roomBranch = catalog?.roomBranches.find(
       (item) => item.branchId === Number(values.branchId) && item.roomTypeId === Number(values.roomTypeId),
